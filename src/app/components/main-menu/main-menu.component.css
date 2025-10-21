@@ -52,7 +52,9 @@ button.mat-button{ outline:none; }
   padding: 10px 15px;
   border: none;
 }
-
+.nav-item a {
+  color: rgb(187, 37, 74);
+}
 .openbtn:hover {
   background-color: #444;
 }
