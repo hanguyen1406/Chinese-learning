@@ -1,16 +1,15 @@
-<div class="container">
+<div style="margin-top: 70px;"  class="container">
     <header>
 
       <nav>
         <ol class="breadcrumb repo-breadcrumb">
-          <li *ngIf="role == 'ROLE_ADMINISTRATOR'" class="breadcrumb-item"><a href="/administrator" [routerLink]="['/administrator']" class="router-link-active">Administrator board</a></li>
-          <li *ngIf="role != 'ROLE_ADMINISTRATOR'" class="breadcrumb-item"><a href="/professor" [routerLink]="['/professor']" class="router-link-active">Professor board</a></li>
+          <li *ngIf="role == 'ROLE_ADMINISTRATOR'" class="breadcrumb-item"><a href="/administrator" [routerLink]="['/administrator']" class="router-link-active">Quản trị ADMIN</a></li>
         </ol> 
       </nav>
 
       <div class="box">
         <div style="margin-top: 5px;" *ngIf="role == 'ROLE_ADMINISTRATOR'">
-          <button mat-raised-button color="primary" (click)="addNewUser()">Add new user</button>
+          <button mat-raised-button color="primary" (click)="addNewUser()">Thêm mới user</button>
         </div>
         <div>
 

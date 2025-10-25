@@ -1,145 +1,151 @@
 <div id="app">
-  <nav class="navbar navbar-expand bg-white fixed-top border-bottom border-danger">
-    <div>
-      <div id="main">
-        <button
-          class="openbtn"
-          (click)="openNav()"
-          *ngIf="roleProfessorOrAdmin"
-        >
-          &#9776; Menu
-        </button>
-      </div>
-    </div>
-    <ul
-      class="navbar-nav w-100 justify-content-center"
-      routerLinkActive="active"
+  <nav
+    class="navbar navbar-expand-lg navbar-light bg-white fixed-top border-bottom border-danger"
+  >
+    <a class="navbar-brand" routerLink="home">
+      <img style="height: 30px" src="assets/logo.png" alt="Logo" />
+    </a>
+
+    <!-- Nút 3 gạch: dùng (click) để toggle -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      (click)="isOpen = !isOpen"
+      aria-label="Toggle navigation"
     >
-      <li class="">
-        <a href="/home" class="" routerLink="home"
-          ><img style="height: 30px;" src="assets/logo.png" alt="Logo" />
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="/home" class="nav-link" routerLink="home">TRANG CHỦ</a>
-      </li>
-      <li class="nav-item">
-        <a href="/home" class="nav-link pr-0" routerLink="home"
-          >KHÓA HỌC <i class="ml-1 mt-1 fa fa-caret-down"></i
-        ></a>
-      </li>
-      <li class="nav-item">
-        <a href="/home" class="nav-link" routerLink="home">LIÊN HỆ</a>
-      </li>
-      <li class="nav-item" *ngIf="roleAdmin">
-        <a href="/administrator" class="nav-link" routerLink="administrator"
-          >Administrator Board</a
-        >
-      </li>
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-      <div class="nav-item" *ngIf="roleProfessorOnly">
-        <button mat-button [matMenuTriggerFor]="menuProfessor" class="nav-link">
-          Professor menu
-        </button>
-        <mat-menu #menuProfessor="matMenu">
-          <button mat-menu-item href="/rankstable" routerLink="rankstable">
-            My ranks
-          </button>
-          <button mat-menu-item href="/professor" routerLink="professor">
-            Professor board
-          </button>
-        </mat-menu>
-      </div>
-
-      <li class="nav-item" *ngIf="roleStudent">
-        <a href="/user" class="nav-link" *ngIf="isLoggedIn" routerLink="user"
-          >Student Board</a
-        >
-      </li>
-
-      <li class="nav-item" *ngIf="forum?.javni == true || roleProfessorOrAdmin">
-        <a href="/forum" class="nav-link" routerLink="forum">Forum</a>
-      </li>
-    </ul>
-
-    <ul class="navbar-nav" *ngIf="!isLoggedIn">
-      <li class="nav-item">
-        <a href="/register" class="nav-link text-nowrap" routerLink="register"
-          >Đăng ký</a
-        >
-      </li>
-      <li class="nav-item">
-        <a href="/login" class="nav-link text-nowrap" routerLink="login"
-          >Đăng nhập</a
-        >
-      </li>
-    </ul>
-
-    <ul class="navbar-nav" *ngIf="isLoggedIn">
-      <li
-        class="nav-item"
-        style="margin-right: 3px; margin-top: 5px"
-        *ngIf="roleStudent"
+    <!-- Khối collapse: chỉ cần thêm [class.show]="isOpen" -->
+    <div class="collapse navbar-collapse" [class.show]="isOpen">
+      <!-- ====== MENU CỦA ANH (giữ nguyên) ====== -->
+      <ul
+        class="navbar-nav w-100 justify-content-lg-center"
+        routerLinkActive="active"
       >
-        <button
-          style="
-            background-color: transparent;
-            color: #ffffff80;
-            border: 0px;
-            outline: 0;
-          "
-          [matMenuTriggerFor]="menu"
-          #menuTrigger="matMenuTrigger"
-          (click)="menuTrigger.openMenu()"
-        >
-          <mat-icon
-            matBadge="{{ subjectNotifications.length }}"
-            [matBadgeHidden]="subjectNotifications.length == 0"
-            >notifications</mat-icon
+        <li class="nav-item">
+          <a class="nav-link" routerLink="home" (click)="close()">TRANG CHỦ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link pr-0" routerLink="home" (click)="close()"
+            >KHÓA HỌC <i class="ml-1 mt-1 fa fa-caret-down"></i
+          ></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="home" (click)="close()">LIÊN HỆ</a>
+        </li>
+        <li class="nav-item" *ngIf="roleAdmin">
+          <a class="nav-link" routerLink="administrator" (click)="close()"
+            >Quản trị ADMIN</a
           >
-        </button>
+        </li>
 
-        <mat-menu #menu="matMenu" [overlapTrigger]="false" xPosition="before">
-          <span (mouseleave)="menuTrigger.closeMenu()">
-            <ul>
-              <li
-                style="padding-right: 20px; font-weight: bold"
-                *ngIf="subjectNotifications.length == 0"
-              >
-                Have no new notifications
-              </li>
-              <li
-                style="padding-right: 20px"
-                *ngFor="let subjectNotification of subjectNotifications"
-              >
-                <button
-                  type="button"
-                  style="border: 0px; outline: 0"
-                  (click)="
-                    menuTrigger.closeMenu();
-                    readNotifications(subjectNotification)
-                  "
+        <li class="nav-item" *ngIf="roleProfessorOnly">
+          <button
+            mat-button
+            [matMenuTriggerFor]="menuProfessor"
+            class="nav-link p-0"
+            style="background: transparent; border: 0"
+          >
+            Professor menu
+          </button>
+          <mat-menu #menuProfessor="matMenu">
+            <button mat-menu-item routerLink="rankstable" (click)="close()">
+              My ranks
+            </button>
+            <button mat-menu-item routerLink="professor" (click)="close()">
+              Professor board
+            </button>
+          </mat-menu>
+        </li>
+
+        <li class="nav-item" *ngIf="roleStudent">
+          <a
+            class="nav-link"
+            *ngIf="isLoggedIn"
+            routerLink="user"
+            (click)="close()"
+            >Student Board</a
+          >
+        </li>
+
+        <li
+          class="nav-item"
+          *ngIf="forum?.javni == true || roleProfessorOrAdmin"
+        >
+          <a class="nav-link" routerLink="forum" (click)="close()">Forum</a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ml-auto" *ngIf="!isLoggedIn">
+        <li class="nav-item">
+          <a
+            class="nav-link text-nowrap"
+            routerLink="register"
+            (click)="close()"
+            >Đăng ký</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-nowrap" routerLink="login" (click)="close()"
+            >Đăng nhập</a
+          >
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ml-auto align-items-center" *ngIf="isLoggedIn">
+        <li class="nav-item mr-2 mt-1" *ngIf="roleStudent">
+          <button
+            class="btn btn-link p-0"
+            [matMenuTriggerFor]="menu"
+            #menuTrigger="matMenuTrigger"
+          >
+            <mat-icon
+              matBadge="{{ subjectNotifications.length }}"
+              [matBadgeHidden]="subjectNotifications.length == 0"
+              >notifications</mat-icon
+            >
+          </button>
+          <mat-menu #menu="matMenu" [overlapTrigger]="false" xPosition="before">
+            <span (mouseleave)="menuTrigger.closeMenu()">
+              <ul class="list-unstyled mb-0 p-2">
+                <li
+                  class="font-weight-bold"
+                  *ngIf="subjectNotifications.length == 0"
                 >
-                  <span class="focusNotification">{{
-                    subjectNotification.naziv
-                  }}</span>
-                </button>
-              </li>
-            </ul>
-          </span>
-        </mat-menu>
-      </li>
+                  Have no new notifications
+                </li>
+                <li *ngFor="let subjectNotification of subjectNotifications">
+                  <button
+                    type="button"
+                    class="btn btn-link p-0"
+                    (click)="
+                      menuTrigger.closeMenu();
+                      readNotifications(subjectNotification)
+                    "
+                  >
+                    <span class="focusNotification">{{
+                      subjectNotification.naziv
+                    }}</span>
+                  </button>
+                </li>
+              </ul>
+            </span>
+          </mat-menu>
+        </li>
 
-      <li class="nav-item">
-        <a href="/profile" class="nav-link" routerLink="profile">{{
-          username
-        }}</a>
-      </li>
-      <li class="nav-item">
-        <a href class="nav-link" (click)="logout()">Log Out</a>
-      </li>
-    </ul>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="profile" (click)="close()">{{
+            username
+          }}</a>
+        </li>
+        <li class="nav-item">
+          <a style="white-space: nowrap; cursor: pointer;" class="nav-link" (click)="logout(); close()">Thoát</a>
+        </li>
+      </ul>
+    </div>
   </nav>
+
   <div></div>
 
   <div id="mySidebar" class="sidebar">

@@ -1,4 +1,4 @@
-import { Professor } from "./professor";
+// import { Professor } from "./professor";
 import { Role } from "./role";
 import { Student } from "./student";
 
@@ -10,6 +10,6 @@ export interface User {
     email: string,
     password: string,
     student:Student,
-    professor:Professor,
+    professor:any,
     roles: Set<Role>;
 }

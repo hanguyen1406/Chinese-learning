@@ -18,8 +18,8 @@ export class RegisterComponent implements OnInit {
 
   formRegistrationUser : FormGroup = new FormGroup({
     "id" : new FormControl(null),
-    "name" : new FormControl(null, [Validators.required]),
-    "surname" : new FormControl(null, [Validators.required]),
+    "name" : new FormControl(null),
+    "surname" : new FormControl(null),
     "username" : new FormControl(null, [Validators.required]),
     "email" : new FormControl(null, [Validators.required, Validators.email]),
     "password" : new FormControl(null, [Validators.required])
