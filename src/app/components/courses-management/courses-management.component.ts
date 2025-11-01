@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Role } from 'src/app/model/role';
-import { RoleService } from 'src/app/service/role/role.service';
-import { TokenStorageService } from 'src/app/service/token-storage/token-storage.service';
+import { Role } from '../../model/role';
+import { RoleService } from '../../service/role/role.service';
+import { TokenStorageService } from '../../service/token-storage/token-storage.service';
 
 @Component({
   selector: 'app-courses-management',
