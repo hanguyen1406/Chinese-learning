@@ -3,14 +3,9 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { User } from '../../../model/user';
 import { TokenStorageService } from '../../../service/token-storage/token-storage.service';
 import { UserService } from '../../../service/user/user.service';
-// import { StudentService } from 'src/app/service/student/student.service';
-// import { ProfessorService } from 'src/app/service/professor/professor.service';
-// import { Professor } from 'src/app/model/professor';
-// import { Student } from 'src/app/model/student';
 import { City, Country } from 'country-state-city';
-// import { Adress } from 'src/app/model/adress';
 import { Router } from '@angular/router';
-import { NgxNotificationMsgService, NgxNotificationStatusMsg } from 'ngx-notification-msg';
+import { NgxNotificationDirection, NgxNotificationMsgService, NgxNotificationStatusMsg } from 'ngx-notification-msg';
 import { Adress } from '../../../model/adress';
 
 @Component({
@@ -44,21 +39,6 @@ export class ProfileComponent implements OnInit {
     "roles" : new FormControl(null),
   });
 
-  formCreateEditProfessorAndStudent : FormGroup = new FormGroup({
-    "id" : new FormControl(null),
-    "jmbg" : new FormControl(null),
-    "dateOfBirth" : new FormControl(null),
-    "address" : new FormControl(null),
-    "phoneNumber" : new FormControl(null),
-    "biography" : new FormControl(null),
-    "user" : new FormControl(null)
-  });
-
-  formCreateEditAddress : FormGroup = new FormGroup({
-    "country" : new FormControl("Serbia", null),
-    "city" : new FormControl(null, [Validators.required]),
-    "streetAndNumber" : new FormControl(null)
-  });
 
   constructor(private token: TokenStorageService, public us: UserService,
     private router: Router, private readonly ngxNotificationMsgService: NgxNotificationMsgService) { }
@@ -66,29 +46,6 @@ export class ProfileComponent implements OnInit {
   ngOnInit(): void {
     const currentUser = this.token.getUser();
 
-    if(currentUser.roles.includes('ROLE_PROFESSOR')){
-      // this.ps.getByUsername(currentUser.username).subscribe((professor : any) => {
-      //   this.userAdress = professor.address;
-      //   this.formCreateEditProfessorAndStudent.patchValue(professor);
-      //   // this.formCreateEditAddress.get("country").setValue(professor.address.country);
-      //   // this.formCreateEditAddress.get("city").setValue(professor.address.city);
-      //   // this.formCreateEditAddress.get("streetAndNumber").setValue(professor.address.streetAndNumber);
-      //   this.selectCountry(professor.address.country);
-      // });
-      this.full = true
-    } 
-
-    if(currentUser.roles.includes('ROLE_STUDENT')){
-      // this.ss.getByUsername(currentUser.username).subscribe((student : any) => {
-      //   this.formCreateEditProfessorAndStudent.patchValue(student);
-      //   // this.formCreateEditAddress.get("country").setValue(student.address.country);
-      //   // this.formCreateEditAddress.get("city").setValue(student.address.city);
-      //   // this.formCreateEditAddress.get("streetAndNumber").setValue(student.address.streetAndNumber);
-      //   this.userAdress = this.formCreateEditAddress.value;
-      //   this.selectCountry(student.address.country);
-      // });
-      this.full = true
-    }
 
     this.us.getOne(currentUser.username).subscribe((user : User) => {
       console.log(user)
@@ -96,18 +53,11 @@ export class ProfileComponent implements OnInit {
       this.formCreateEditUser.patchValue(user);
       for(let role of user.roles){
         if(role.name.toString() == "ROLE_ADMINISTRATOR"){ this.roles.push("Administrator"); } 
-        else if(role.name.toString() == "ROLE_PROFESSOR"){ this.roles.push("Professor"); } 
-        else if(role.name.toString() == "ROLE_STUDENT"){ this.roles.push("Student"); } 
         else if(role.name.toString() == "ROLE_USER"){ this.roles.push("User"); } 
         else { this.roles.push(role.name.toString());}
       }
 
-      for(let country of Country.getAllCountries()){  // get all country and city for that country
-        this.countrys.push(country.name);
-        if(country.name == this.formCreateEditAddress.value.country) {
-          // for(let city of City.getCitiesOfCountry(country.isoCode)) { this.citys.push(city.name); };
-        }
-      };
+     
       
     });
   };
@@ -129,38 +79,23 @@ export class ProfileComponent implements OnInit {
             this.formCreateEditUser.patchValue(user);
             this.ngxNotificationMsgService.open({
               status: NgxNotificationStatusMsg.SUCCESS,
-              header: 'Edit profile',
-              messages: ['You have successfully edited profile.']
+              header: 'Cập nhật hồ sơ',
+              messages: ['Bạn đã cập nhật hồ sơ thành công.'],
+              direction: NgxNotificationDirection.BOTTOM_RIGHT
             });
           });
         });
       }
 
-      if(this.roles.includes("Professor") || this.roles.includes("Student")) {
-      this.formCreateEditProfessorAndStudent.value.user = this.formCreateEditUser.value; // set user from form
-      this.formCreateEditProfessorAndStudent.value.address = this.formCreateEditAddress.value; // set address object form form
-      this.userAdress = this.formCreateEditAddress.value;
-        // if(this.roles.includes("Professor")){
-        //   this.ps.update(this.formCreateEditProfessorAndStudent.value.id, this.formCreateEditProfessorAndStudent.value).subscribe();
-        // }
-        // if(this.roles.includes("Student")){
-        //   this.ss.update(this.formCreateEditProfessorAndStudent.value.id, this.formCreateEditProfessorAndStudent.value).subscribe();
-        // }
-      }
+     
+      
     } else {
       this.errorMessage = "You can fill in all fields, where star!";
       this.isFailed = true;
     }
   };
 
-  selectCountry(selectedCountry: string){
-    for(let country of Country.getAllCountries()){  // get all country and city for that country
-      if(country.name == selectedCountry) {
-        this.citys = [];
-        // for(let city of City.getCitiesOfCountry(country.isoCode)){ this.citys.push(city.name); };
-      }
-    };
-  }
+
 
   checkU(){
     // if(this.formCreateEditUser.get("username").valid == true){

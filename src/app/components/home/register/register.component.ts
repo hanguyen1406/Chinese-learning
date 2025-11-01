@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/service/auth/auth.service';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { NgxNotificationMsgService, NgxNotificationStatusMsg} from 'ngx-notification-msg'
+import { NgxNotificationDirection, NgxNotificationMsgService, NgxNotificationStatusMsg} from 'ngx-notification-msg'
 
 @Component({
   selector: 'app-register',
@@ -41,8 +41,9 @@ export class RegisterComponent implements OnInit {
 
           this.ngxNotificationMsgService.open({
             status: NgxNotificationStatusMsg.SUCCESS,
-            header: 'Registration',
-            messages: ['You have successfully registered.']
+            header: 'Đăng ký',
+            messages: ['Đăng ký thành công.'],
+            direction: NgxNotificationDirection.BOTTOM_RIGHT
           });
 
         },

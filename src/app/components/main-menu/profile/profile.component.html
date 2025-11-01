@@ -1,4 +1,4 @@
-<div style="margin-top: 80px;"  class="container">
+<div style="margin-top: 80px; "  class="container">
   
   <div class="main-body">
     <div class="row">
@@ -11,12 +11,6 @@
                 
                 <h4>{{user?.name}} {{user?.surname}}</h4>
 
-                <p class="text-secondary mb-1">
-                  <ng-container *ngFor="let role of roles; let isLast=last">{{role}}{{isLast ? '' : ', '}}</ng-container>
-                </p> 
-
-                <span *ngIf="full">{{userAdress?.country}}, {{userAdress?.city}}<br>
-                                    {{userAdress?.streetAndNumber}}</span>
               </div>
             </div>
             
@@ -79,9 +73,9 @@
             <div class="row">
               <div class="col-sm-3"></div>
               <div class="col-sm-9 text-secondary">
-                <input type="button" class="btn btn-primary px-4" (click)="saveUser()" *ngIf="formCreateEditUser.value.id != null" value="Lưu thay đổi">
+                <input type="button" class="btn btn-primary px-4" (click)="saveUser()" value="Lưu thay đổi">
                 
-                <input type="button" style="margin-left: 20px;" class="btn btn-primary px-4" (click)="details()" *ngIf="formCreateEditUser.value.id != null" value="Chi tiết">
+                <input type="button" style="margin-left: 20px;" class="btn btn-primary px-4" (click)="details()" value="Chi tiết">
                 <input *ngIf="kliknut" type="button" style="margin-left: 20px;" class="btn btn-primary px-4" (click)="hideDet()" value="Ẩn">
               </div>
             </div>

@@ -1,0 +1,19 @@
+<div style="margin-top: 70px" class="container">
+  <header>
+    <nav>
+      <ol class="breadcrumb repo-breadcrumb">
+        <li *ngIf="role == 'ROLE_ADMINISTRATOR'" class="breadcrumb-item">
+          <a
+            href="/administrator"
+            [routerLink]="['/administrator']"
+            class="router-link-active"
+            >Quản trị ADMIN</a
+          >
+        </li>
+      </ol>
+    </nav>
+  </header>
+
+  <br />
+  <br />
+</div>

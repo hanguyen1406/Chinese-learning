@@ -33,12 +33,12 @@ import { RegisterComponent } from './components/home/register/register.component
 import { HomeComponent } from './components/home/home.component';
 import { ProfileComponent } from './components/main-menu/profile/profile.component';
 import { BoardAdminComponent } from './components/main-menu/board-admin/board-admin.component';
-import { BoardUserComponent } from './components/main-menu/board-user/board-user.component';
 import { UsersManagementComponent } from './components/users-management/users-management-table.component';
 import { CreateEditUserComponent } from './components/users-management/create-edit-user/create-edit-user.component';
 
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { RouterModule } from '@angular/router';
+import { CoursesManagementComponent } from './components/courses-management/courses-management.component';
 
 @NgModule({
   declarations: [
@@ -48,13 +48,11 @@ import { RouterModule } from '@angular/router';
     HomeComponent,
     ProfileComponent,
     BoardAdminComponent,
-    BoardUserComponent,
     CreateEditUserComponent,
     MainMenuComponent,
     UsersManagementComponent,
     CreateEditUserComponent,
-    // PickSubjectComponent,
-    // SubjectDetailsComponent,
+    CoursesManagementComponent,
   ],
   imports: [
     BrowserModule,

@@ -36,7 +36,6 @@ export class UsersManagementComponent implements OnInit {
   users: User[] = [];
   roles: Role[] = [];
   us: User;
-  kliknut: boolean = false;
 
   role: string = '';
 
@@ -121,56 +120,12 @@ export class UsersManagementComponent implements OnInit {
       map((value) => this._filter(value || ''))
     );
 
-    if (this.role != 'ROLE_ADMINISTRATOR') {
-      this.roleService.getByName('ROLE_STUDENT').subscribe((x) => {
-        this.searchRoleID = x.id.toString();
-        this.refreshTable();
-      });
-    } // Ako korisnik nije administrator prikazati mu samo studente
-    else {
-      this.refreshTable();
-    } // Ako je korisnik administrator samo uradimo refresh table
+    this.refreshTable();
   }
 
-  selectStudentDetails(user: User) {
-    //ZA ISTORIJU STUDIRANJA
-    this.kliknut = true;
-    this.test = [];
-    this.city = '';
-    this.country = '';
-    this.steet = '';
-
-    if (this.bodovi > 0) {
-      this.bodovi = 0;
-    }
-
-    // this.sy.getSubjectsByID(user.id).subscribe((x) => {
-    //   this.upisi = x;
-    //   //console.log("UPISI",x);
-    // });
-
-    // this.sy.getOne(user.id).subscribe((x) => {
-    //   this.student = x;
-    //   let u = x;
-    //   for (let r of u.studentTests) {
-    //     this.test.push(r);
-    //     this.city = String(x.student.address.city);
-    //     this.country = String(x.student.address.country);
-    //     this.steet = String(x.student.address.streetAndNumber);
-
-    //     //console.log("ADRESA", this.adresa)
-    //   }
-    //   for (let b of u.studentTests) {
-    //     let testovi = [];
-    //     // testovi.push(b);
-
-    //     this.bodovi += b.ocena / this.test.length;
-    //   }
-    // });
-  }
+  
 
   hide() {
-    this.kliknut = false;
   }
 
   selectForChange(user: User) {
