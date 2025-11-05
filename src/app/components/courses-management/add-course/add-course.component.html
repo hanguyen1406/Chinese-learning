@@ -1,0 +1,72 @@
+<!-- course-create-dialog.component.html -->
+<h3 class="modal-title text-center mb-0"><b>Thêm khóa học</b></h3>
+
+<div mat-dialog-content class="modal-body">
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-group">
+      <label for="name">Tên khóa học <span class="text-danger">*</span></label>
+      <input
+        id="name"
+        type="text"
+        class="form-control"
+        [ngClass]="{ 'is-invalid': f.name.touched && f.name.invalid }"
+        formControlName="name"
+        maxlength="255"
+        required
+      />
+      <div class="invalid-feedback">Vui lòng nhập tên khóa học</div>
+      <small class="form-text text-muted">
+        {{ form.get("name")?.value?.length || 0 }} / 255
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Mô tả</label>
+      <textarea
+        id="description"
+        rows="4"
+        class="form-control"
+        formControlName="description"
+        placeholder="Giới thiệu ngắn..."
+      ></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="numLesson">Số bài học</label>
+        <input
+          id="numLesson"
+          type="number"
+          min="1"
+          class="form-control"
+          formControlName="numLesson"
+          placeholder="1"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="thumbnailUrl">Thumbnail URL</label>
+      <input
+        id="thumbnailUrl"
+        type="url"
+        class="form-control"
+        formControlName="thumbnailUrl"
+        placeholder="https://..."
+      />
+      <small class="form-text text-muted">Dán URL ảnh bìa (tùy chọn)</small>
+    </div>
+  </form>
+</div>
+
+<div mat-dialog-actions class="modal-footer">
+  <button type="button" class="btn btn-light" (click)="close()">Hủy</button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="submit()"
+    [disabled]="form.invalid"
+  >
+    Lưu
+  </button>
+</div>

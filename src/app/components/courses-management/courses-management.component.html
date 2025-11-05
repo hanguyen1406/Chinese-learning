@@ -1,4 +1,4 @@
-<div style="margin-top: 70px" class="container">
+<div style="margin-top: 55px; background-color: rgb(249, 247, 245);" class="container">
   <header>
     <nav>
       <ol class="breadcrumb repo-breadcrumb">
@@ -12,6 +12,46 @@
         </li>
       </ol>
     </nav>
+
+    <div class="box">
+      <div style="margin-top: 5px" *ngIf="role == 'ROLE_ADMINISTRATOR'">
+        <button mat-raised-button color="primary" (click)="openCreate()">
+          Thêm mới khóa học
+        </button>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-sm-6 col-lg-4 mb-4" *ngFor="let c of courses">
+        <div class="card h-100 shadow-sm border-0 hover-move-card">
+          <!-- ảnh 16:9 -->
+          <div class="embed-responsive embed-responsive-16by9">
+            <img
+              class="embed-responsive-item"
+              [src]="getImageUrl(c.thumbnailUrl)"
+            />
+          </div>
+
+          <div class="card-body p-2">
+            <h4 class="card-title mb-1 text-truncate" [title]="c.name">
+              {{ c.name }}
+            </h4>
+            <div class="text-danger font-weight-bold">Miễn phí</div>
+          </div>
+
+          <div class="card-footer bg-white">
+            <ul class="list-inline mb-0 small text-muted">
+              <!-- người học: tạm dùng numRating nếu chưa có trường riêng -->
+              <li class="list-inline-item mr-3">
+                <span class="mr-1">⭐</span>{{ c.numRating }}
+              </li>
+              <li class="list-inline-item mr-3">
+                <span class="mr-1">▶️</span>{{ c.numLesson }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </header>
 
   <br />

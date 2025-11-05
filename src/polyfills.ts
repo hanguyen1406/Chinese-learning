@@ -59,7 +59,7 @@ import 'zone.js/dist/zone';  // Included with Angular CLI.
 (window as any).global = window;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-global.Buffer = global.Buffer || require('buffer').Buffer;
+// global.Buffer = global.Buffer || require('buffer').Buffer;
 
 
 

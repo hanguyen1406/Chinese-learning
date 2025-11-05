@@ -27,7 +27,7 @@
           <a class="nav-link" routerLink="home" (click)="close()">TRANG CHỦ</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link pr-0" routerLink="home" (click)="close()"
+          <a class="nav-link pr-0" routerLink="coursestable" (click)="close()"
             >KHÓA HỌC <i class="ml-1 mt-1 fa fa-caret-down"></i
           ></a>
         </li>
@@ -40,35 +40,8 @@
           >
         </li>
 
-        <li class="nav-item" *ngIf="roleProfessorOnly">
-          <button
-            mat-button
-            [matMenuTriggerFor]="menuProfessor"
-            class="nav-link p-0"
-            style="background: transparent; border: 0"
-          >
-            Professor menu
-          </button>
-          <mat-menu #menuProfessor="matMenu">
-            <button mat-menu-item routerLink="rankstable" (click)="close()">
-              My ranks
-            </button>
-            <button mat-menu-item routerLink="professor" (click)="close()">
-              Professor board
-            </button>
-          </mat-menu>
-        </li>
 
-        <li class="nav-item" *ngIf="roleStudent">
-          <a
-            class="nav-link"
-            *ngIf="isLoggedIn"
-            routerLink="user"
-            (click)="close()"
-            >Student Board</a
-          >
-        </li>
-
+       
       </ul>
 
       <ul class="navbar-nav ml-auto" *ngIf="!isLoggedIn">
@@ -88,46 +61,6 @@
       </ul>
 
       <ul class="navbar-nav ml-auto align-items-center" *ngIf="isLoggedIn">
-        <li class="nav-item mr-2 mt-1" *ngIf="roleStudent">
-          <button
-            class="btn btn-link p-0"
-            [matMenuTriggerFor]="menu"
-            #menuTrigger="matMenuTrigger"
-          >
-            <mat-icon
-              matBadge="{{ subjectNotifications.length }}"
-              [matBadgeHidden]="subjectNotifications.length == 0"
-              >notifications</mat-icon
-            >
-          </button>
-          <mat-menu #menu="matMenu" [overlapTrigger]="false" xPosition="before">
-            <span (mouseleave)="menuTrigger.closeMenu()">
-              <ul class="list-unstyled mb-0 p-2">
-                <li
-                  class="font-weight-bold"
-                  *ngIf="subjectNotifications.length == 0"
-                >
-                  Have no new notifications
-                </li>
-                <li *ngFor="let subjectNotification of subjectNotifications">
-                  <button
-                    type="button"
-                    class="btn btn-link p-0"
-                    (click)="
-                      menuTrigger.closeMenu();
-                      readNotifications(subjectNotification)
-                    "
-                  >
-                    <span class="focusNotification">{{
-                      subjectNotification.naziv
-                    }}</span>
-                  </button>
-                </li>
-              </ul>
-            </span>
-          </mat-menu>
-        </li>
-
         <li class="nav-item">
           <a class="nav-link" routerLink="profile" (click)="close()">{{
             username
@@ -151,11 +84,7 @@
       Users
       <i class="fa fa-caret-down"></i>
     </button>
-    <div class="dropdown-container">
-      <a [routerLink]="['/userstable']" *ngIf="roleProfessorOrAdmin"
-        >Users management</a
-      >
-    </div>
+
 
   </div>
   <div class="container">

@@ -2,9 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../../model/user';
-import { map } from 'rxjs/internal/operators/map';
 
-const API_URL = 'http://localhost:8080/api/menu/';
 const USER_URL = 'http://localhost:8080/api/users/';
 
 @Injectable({

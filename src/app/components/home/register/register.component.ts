@@ -1,39 +1,46 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from 'src/app/service/auth/auth.service';
+import { AuthService } from '../../../service/auth/auth.service';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { NgxNotificationDirection, NgxNotificationMsgService, NgxNotificationStatusMsg} from 'ngx-notification-msg'
+import {
+  NgxNotificationDirection,
+  NgxNotificationMsgService,
+  NgxNotificationStatusMsg,
+} from 'ngx-notification-msg';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  styleUrls: ['./register.component.css'],
 })
 export class RegisterComponent implements OnInit {
-
   isSignUpFailed = false;
   errorMessage = '';
   hidePassword = true;
 
-  formRegistrationUser : FormGroup = new FormGroup({
-    "id" : new FormControl(null),
-    "name" : new FormControl(null),
-    "surname" : new FormControl(null),
-    "username" : new FormControl(null, [Validators.required]),
-    "email" : new FormControl(null, [Validators.required, Validators.email]),
-    "password" : new FormControl(null, [Validators.required])
+  formRegistrationUser: FormGroup = new FormGroup({
+    id: new FormControl(null),
+    name: new FormControl(null),
+    surname: new FormControl(null),
+    username: new FormControl(null, [Validators.required]),
+    email: new FormControl(null, [Validators.required, Validators.email]),
+    password: new FormControl(null, [Validators.required]),
   });
 
-  constructor(private authService: AuthService, private location: Location, private router: Router, private readonly ngxNotificationMsgService: NgxNotificationMsgService) { }
+  constructor(
+    private authService: AuthService,
+    private location: Location,
+    private router: Router,
+    private readonly ngxNotificationMsgService: NgxNotificationMsgService
+  ) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   saveUser(): void {
-    if(this.formRegistrationUser.valid) {
+    if (this.formRegistrationUser.valid) {
       this.authService.register(this.formRegistrationUser.value).subscribe(
-        data => {
+        (data) => {
           console.log(data);
           this.isSignUpFailed = false;
           this.formRegistrationUser.reset();
@@ -43,11 +50,10 @@ export class RegisterComponent implements OnInit {
             status: NgxNotificationStatusMsg.SUCCESS,
             header: 'Đăng ký',
             messages: ['Đăng ký thành công.'],
-            direction: NgxNotificationDirection.BOTTOM_RIGHT
+            direction: NgxNotificationDirection.BOTTOM_RIGHT,
           });
-
         },
-        err => {
+        (err) => {
           this.errorMessage = err.error.message;
           this.isSignUpFailed = true;
         }
@@ -55,7 +61,7 @@ export class RegisterComponent implements OnInit {
     }
   }
 
-  cancel(){
+  cancel() {
     this.formRegistrationUser.reset();
     this.location.back();
   }

@@ -50,48 +50,20 @@ export class MainMenuComponent implements OnInit {
   ngOnInit(): void {
     this.isLoggedIn = !!this.tokenStorageService.getToken();
 
-    // this.forumService.getForum().subscribe((forum) => {
-    //   this.forum = forum;
-    // });
-
     if (this.isLoggedIn) {
+      if (this.tokenStorageService.isTokenExpired()) {
+        this.tokenStorageService.signOut();
+        this.router.navigate(['/home']).then(() => {
+          window.location.reload();
+        });
+
+        return;
+      }
       const user = this.tokenStorageService.getUser();
       this.roles = user.roles;
 
-      //Dobavljanje novih obavestenja za predmet i provera da li su vec procitana
-      if (user.roles.includes('ROLE_STUDENT')) {
-        // this.folloWSubjectService.getSubjects(user.id).subscribe((subject) => {
-        //   let subjectNotifications: any[] = [];
-        //   for (let i of subject) {
-        //     for (let x of i.subjects) {
-        //       for (let j of x.subjectNotifications) {
-        //         subjectNotifications.push(j);
-        //       }
-        //     }
-        //   }
-        //   this.studentService
-        //     .getByUsername(user.username)
-        //     .subscribe((student) => {
-        //       this.student = student;
-        //       this.subjectNotifications = [].concat(
-        //         // subjectNotifications.filter(notification1 =>  student.subjectNotifications.every(notification2 => notification1['id'] !== notification2['id'])),
-        //         student.subjectNotifications.filter((notification2) =>
-        //           subjectNotifications.every(
-        //             (notification1) =>
-        //               notification2['id'] !== notification1['id']
-        //           )
-        //         )
-        //       );
-        //     });
-        // });
-      }
-      ////////////////////////////////////////////////////////////////////////////
-
       this.roleAdmin = this.roles.includes('ROLE_ADMINISTRATOR');
       this.roleProfessorOrAdmin = this.roles.includes('ROLE_ADMINISTRATOR');
-      this.roleProfessorOnly = this.roles.includes('ROLE_PROFESSOR');
-      this.roleStudent = this.roles.includes('ROLE_STUDENT');
-
       this.username = user.username;
 
       this.openNav();
@@ -132,12 +104,6 @@ export class MainMenuComponent implements OnInit {
       if (value['id'] == notifications['id'])
         this.subjectNotifications.splice(index, 1);
     }); //Izbacujemo iz liste notifikaciju koju smo otvorili
-    this.student.subjectNotifications.push(notifications);
-    // this.studentService.readNotification(this.student).subscribe();
-    // this.dialog.open(SubjectNotificationsDialog, {
-    //   width: '650px',
-    //   data: notifications
-    // });
   }
 
   logout(): void {

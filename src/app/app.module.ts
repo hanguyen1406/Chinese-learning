@@ -39,6 +39,7 @@ import { CreateEditUserComponent } from './components/users-management/create-ed
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { RouterModule } from '@angular/router';
 import { CoursesManagementComponent } from './components/courses-management/courses-management.component';
+import { AddCourseComponent } from './components/courses-management/add-course/add-course.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +54,7 @@ import { CoursesManagementComponent } from './components/courses-management/cour
     UsersManagementComponent,
     CreateEditUserComponent,
     CoursesManagementComponent,
+    AddCourseComponent,
   ],
   imports: [
     BrowserModule,

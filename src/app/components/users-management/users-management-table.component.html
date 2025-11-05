@@ -63,7 +63,7 @@
             this.searchSurname != '' ||
             (this.searchRoleID != '' && role == 'ROLE_ADMINISTRATOR') ||
             this.searchName != '' ||
-              (this.searchSurname != '' && role != 'ROLE_ADMINISTRATOR')
+            (this.searchSurname != '' && role != 'ROLE_ADMINISTRATOR')
           "
         >
           <span class="cross" (click)="resetSearch()" title="Reset search"
@@ -158,16 +158,6 @@
                     <mat-icon>edit</mat-icon>
                   </button>
                 </ng-container>
-                <ng-container *ngFor="let role of user.roles">
-                  <button
-                    *ngIf="role.name == 'ROLE_STUDENT'"
-                    mat-icon-button
-                    color="primary"
-                    (click)="selectStudentDetails(user)"
-                  >
-                    <mat-icon>dehaze</mat-icon>
-                  </button>
-                </ng-container>
               </div>
             </div>
           </td>
@@ -187,7 +177,7 @@
       ></mat-paginator>
     </div>
 
-    <div *ngIf="dataSource?.data.length === 0">No Records Found!</div>
+    <div *ngIf="dataSource?.data.length === 0">Chưa có dữ liệu!</div>
   </header>
 
   <br />
