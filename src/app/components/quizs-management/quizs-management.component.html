@@ -19,44 +19,35 @@
 
     <div class="box mb-3" *ngIf="role == 'ROLE_ADMINISTRATOR'">
       <button mat-raised-button color="primary" (click)="openCreate()">
-        Thêm mới khóa học
+        Thêm mới Bài kiểm tra
       </button>
     </div>
     <div *ngIf="role != 'ROLE_ADMINISTRATOR'">
       <br />
-      <h2><b> Khóa học miễn phí </b></h2>
+      <h2><b> Các bài kiểm tra </b></h2>
     </div>
 
-    <div *ngIf="courses && courses.length > 0; else noCourses" class="row mt-4">
-      <div class="col-sm-6 col-lg-4 mb-4" *ngFor="let c of courses">
-        <a [routerLink]="['/coursestable', c.id]" class="text-decoration-none">
+    <div *ngIf="quizs && quizs.length > 0; else noQuizs" class="row mt-4">
+      <div class="col-sm-6 col-lg-4 mb-4" *ngFor="let c of quizs">
+        <a [routerLink]="['/quizs', c.id]" class="text-decoration-none">
           <div
             style="border-radius: 15px; height: 280px"
             class="shadow border-0 hover-move-card cursor-pointer"
           >
-            <img style="height: 190px" [src]="getImageUrl(c.thumbnailUrl)" />
-
             <div class="card-body p-2">
               <h4 class="card-title mb-1 text-truncate" [title]="c.name">
                 <b>
-                  {{ c.name }}
+                  <!-- {{ c.name }} -->
                 </b>
               </h4>
               <div class="text-danger font-weight-bold">Miễn phí</div>
-            </div>
-
-            <div style="color: black" class="border-0">
-              <ul class="d-flex justify-content-center p-0">
-                <li class="list-inline-item mr-3">⭐ {{ c.numRating }}</li>
-                <li class="list-inline-item mr-3">▶️ {{ c.numLesson }}</li>
-              </ul>
             </div>
           </div>
         </a>
       </div>
     </div>
-    <ng-template #noCourses>
-      <div class="text-center"><h3>Không có khóa học nào.</h3></div>
+    <ng-template #noQuizs>
+      <div class="text-center"><h3>Không có bài kiểm tra nào.</h3></div>
     </ng-template>
   </header>
 </div>

@@ -40,6 +40,12 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { RouterModule } from '@angular/router';
 import { CoursesManagementComponent } from './components/courses-management/courses-management.component';
 import { AddCourseComponent } from './components/courses-management/add-course/add-course.component';
+import { DetailCourseComponent } from './components/courses-management/detail-course/detail-course.component';
+import { AddLessonComponent } from './components/courses-management/detail-course/add-lesson/add-lesson.component';
+import { CommentLessonComponent } from './components/courses-management/detail-course/comment-lesson/comment-lesson.component';
+import { MatListModule } from '@angular/material/list';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { QuizsManagementComponent } from './components/quizs-management/quizs-management.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +61,10 @@ import { AddCourseComponent } from './components/courses-management/add-course/a
     CreateEditUserComponent,
     CoursesManagementComponent,
     AddCourseComponent,
+    DetailCourseComponent,
+    AddLessonComponent,
+    CommentLessonComponent,
+    QuizsManagementComponent,
   ],
   imports: [
     BrowserModule,
@@ -83,6 +93,8 @@ import { AddCourseComponent } from './components/courses-management/add-course/a
     NgxNotificationMsgModule,
     MatDialogModule,
     MatBadgeModule,
+    MatListModule,
+    MatSidenavModule
   ],
   providers: [authInterceptorProviders],
   bootstrap: [AppComponent],

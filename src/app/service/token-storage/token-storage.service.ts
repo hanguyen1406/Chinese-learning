@@ -26,7 +26,7 @@ export class TokenStorageService {
     window.sessionStorage.setItem(TOKEN_KEY, token);
   }
 
-  public getToken(): string {
+  public getToken(): any {
     return sessionStorage.getItem(TOKEN_KEY);
   }
 
@@ -43,24 +43,32 @@ export class TokenStorageService {
     try {
       token = token ?? this.getToken();
       if (!token) return true;
+
       const payload = this.decodeJwt(token);
-      if (!payload?.exp) return true; // không có exp coi như không hợp lệ
+      if (!payload?.exp) return true; // Không có exp => coi như hết hạn
+
       const nowSec = Math.floor(Date.now() / 1000);
-      return payload.exp <= nowSec;
-    } catch {
-      return true; // decode lỗi => coi như hết hạn/invalid
+      console.log('Token exp:', payload.exp, 'Now:', nowSec);
+
+      return nowSec >= payload.exp; // now >= exp => HẾT HẠN
+    } catch (e) {
+      console.error('JWT decode error:', e);
+      return true; // Lỗi giải mã => coi như invalid
     }
   }
+
+  /**
+   * Decode payload của JWT.
+   * KHÔNG verify signature (front-end không verify được).
+   */
   private decodeJwt(token: string): JwtPayload {
-    const base64Url = token.split('.')[1];
-    if (!base64Url) throw new Error('Invalid JWT format');
+    const parts = token.split('.');
+    if (parts.length !== 3) throw new Error('Invalid JWT format');
+
+    const base64Url = parts[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const json = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(json);
-  }
+
+    const json = atob(base64); // decode base64
+    return JSON.parse(json); // parse payload
+  } 
 }

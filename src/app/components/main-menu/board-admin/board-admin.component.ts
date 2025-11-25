@@ -15,18 +15,15 @@ import { UserService } from '../../../service/user/user.service';
 })
 export class BoardAdminComponent implements OnInit {
   countUsers: number = 0;
-  countProfessors: number = 0;
-  countStudents: number = 0;
-  countAdministrators: number = 0;
-  countUniversities: number = 0;
-  countFaculty: number = 0;
+  countQuiz: number = 0;
+  countCourses: number = 0;
 
   constructor(
     private router: Router,
     private userService: UserService,
     private roleService: RoleService
   ) {
-    // this.userService.countUser("", "", "").subscribe((x : number) => { this.countUsers = x });
+    this.userService.countUser("", "", "").subscribe((x : number) => { this.countUsers = x });
     // this.professorService.getAll().subscribe(x => { this.countProfessors = x.length });
     // this.studentService.getAll().subscribe(x => { this.countStudents = x.length });
     // this.uni.getAll().subscribe(x=> { this.countUniversities = x.length });

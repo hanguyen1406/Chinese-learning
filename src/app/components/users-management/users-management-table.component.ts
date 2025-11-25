@@ -15,14 +15,7 @@ import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
 import { TokenStorageService } from '../../service/token-storage/token-storage.service';
-// import { StudentServiceService } from 'src/app/service/student-service/student-service.service';
-// import { StudentTestService } from 'src/app/service/student-test/student-test.service';
-// import { StudentTests } from 'src/app/model/student-tests';
-// import { StudentService } from 'src/app/model/student-service';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
-// import { StudentOnTheYearService } from 'src/app/service/student-on-the-year/student-on-the-year.service';
-// import { StudentOnTheYear } from 'src/app/model/student-on-the-year';
-// import { Adress } from 'src/app/model/adress';
 
 @Component({
   selector: 'app-users-management-table',
@@ -39,9 +32,7 @@ export class UsersManagementComponent implements OnInit {
 
   role: string = '';
 
-  pageStart: boolean = true; // ovo mora zbog autocomplete, sam se pozove kad udjem na stranicu pa pravi gresku searchu, zato sto jos nema datasource
-
-  //Autocomplete
+  pageStart: boolean = true;
   myControl = new FormControl();
   filteredOptions: Observable<User[]> | undefined;
 
@@ -72,7 +63,6 @@ export class UsersManagementComponent implements OnInit {
   searchRoleID: string = '';
 
   history: History[] = [];
-  tests: any[] = [];
   service: any[] = [];
 
   student: any;
@@ -99,7 +89,6 @@ export class UsersManagementComponent implements OnInit {
   formHistory: FormGroup = new FormGroup({
     id: new FormControl(null),
     user: new FormControl(null),
-    tests: new FormControl(null),
     enroll: new FormControl(null),
   });
 
@@ -123,10 +112,7 @@ export class UsersManagementComponent implements OnInit {
     this.refreshTable();
   }
 
-  
-
-  hide() {
-  }
+  hide() {}
 
   selectForChange(user: User) {
     this.router.navigate([
@@ -146,7 +132,6 @@ export class UsersManagementComponent implements OnInit {
   }
 
   refreshTable() {
-    // this.userService.countUser(this.searchName, this.searchSurname, this.searchRoleID).subscribe((x : number) => { this.total = x } )
     this.userService
       .getAll(
         this.pageNo,
@@ -159,27 +144,23 @@ export class UsersManagementComponent implements OnInit {
       .subscribe((newUsers) => {
         this.users = newUsers;
         console.log(newUsers);
-        //Data Table Data Source and pagination with dynamic data
         this.dataSource = new MatTableDataSource(newUsers.slice());
         this.dataSource.sort = this.sort;
       });
   }
 
-  /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = !!this.dataSource && this.dataSource.data.length;
     return numSelected === numRows;
   }
 
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle() {
     this.isAllSelected()
       ? this.selection.clear()
       : this.dataSource.data.forEach((r) => this.selection.select(r));
   }
 
-  /** The label for the checkbox on the passed row */
   checkboxLabel(row: User): string {
     if (!row) {
       return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
@@ -192,7 +173,7 @@ export class UsersManagementComponent implements OnInit {
   delete() {
     const numSelected = this.selection.selected;
     if (numSelected.length > 0) {
-      if (confirm('Are you sure to delete items?')) {
+      if (confirm('Bạn có chắc chắn muốn xóa các mục đã chọn?')) {
         for (let object of numSelected) {
           this.userService.delete(object.id).subscribe((x) => {
             this.refreshTable();
@@ -201,7 +182,7 @@ export class UsersManagementComponent implements OnInit {
         }
       }
     } else {
-      alert('Error: Select at least one row!');
+      alert('Lỗi: vui lòng chọn ít nhất một hàng!');
     }
   }
 
@@ -219,11 +200,9 @@ export class UsersManagementComponent implements OnInit {
 
       if (filterValues[1] != undefined && filterValues[1] != '') {
         this.searchSurname = filterValues[1];
-      } //Ako na drugom indeksu ne postoji nista onda ne dodeljujemo surname
-      else {
+      } else {
         this.searchSurname = '';
-      } //Kada brisemo search ako ne postoji nista na drugom indeksu setovati opet prazan string
-
+      }
       this.refreshTable();
     }
     const filterValue = value.toString().toLowerCase();
@@ -245,17 +224,10 @@ export class UsersManagementComponent implements OnInit {
   resetSearch() {
     if (this.role == 'ROLE_ADMINISTRATOR') {
       this.searchRoleID = '';
-    } // samo ako je korisnik admin resetujemo role, inace ako nije admin ostavljamo role koji je na pocetku definisan
+    }
     this.myControl.setValue('');
     this.searchName = '';
     this.searchSurname = '';
     this.refreshTable();
-  }
-
-  //JUST FOR TEST
-  generate300Users() {
-    this.userService.generate300Users().subscribe((x) => {
-      this.refreshTable();
-    });
   }
 }

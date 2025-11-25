@@ -1,0 +1,121 @@
+<mat-drawer-container class="page-container">
+  <div style="margin-top: 55px" class="container">
+    <header>
+      <nav>
+        <ol
+          *ngIf="role == 'ROLE_ADMINISTRATOR'"
+          class="breadcrumb repo-breadcrumb"
+        >
+          <li class="breadcrumb-item">
+            <a
+              href="/administrator"
+              [routerLink]="['/administrator']"
+              class="router-link-active"
+            >
+              Quản trị ADMIN
+            </a>
+          </li>
+          <li class="breadcrumb-item">
+            <a
+              href="/coursestable"
+              [routerLink]="['/coursestable']"
+              class="router-link-active"
+            >
+              Danh sách Khóa học
+            </a>
+          </li>
+        </ol>
+      </nav>
+
+      <div class="row" *ngIf="role == 'ROLE_ADMINISTRATOR'">
+        <div class="col-md-10">
+          <h2 style="margin: 0px">
+            <b>{{ course?.name }} </b>
+          </h2>
+        </div>
+        <div class="col-md-2">
+          <button mat-raised-button color="primary" (click)="openCreate()">
+            Thêm mới bài giảng
+          </button>
+        </div>
+      </div>
+      <div *ngIf="role != 'ROLE_ADMINISTRATOR'">
+        <br />
+        <h2><b> Khóa học miễn phí </b></h2>
+      </div>
+    </header>
+  </div>
+  <div class="row mt-2">
+    <!-- Vùng video + nội dung -->
+    <div class="col-md-9">
+      <h3 *ngIf="!hasLessons" class="text-center">
+        Khóa học này chưa có bài giảng nào
+      </h3>
+      <div #video class="video-container" *ngIf="videoUrl">
+        <div class="video-wrapper">
+          <iframe
+            [src]="videoUrl"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="container mb-5" *ngIf="selectedLesson">
+          <h2>
+            <b>{{ indexCurrentLesson + 1 }}. {{ selectedLesson.nameLesson }}</b>
+          </h2>
+          <p class="lesson-content" *ngIf="selectedLesson.contentLesson">
+            {{ selectedLesson.contentLesson }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vùng danh sách bài học bên phải -->
+    <div class="col-md-3">
+      <h3>Nội dung Khóa học</h3>
+
+      <div class="lesson-cards">
+        <div
+          *ngFor="let lesson of lessons; let i = index"
+          (click)="selectLesson(lesson)"
+          class="lesson-card"
+          [ngClass]="{ active: lesson === selectedLesson }"
+        >
+          <b>{{ i + 1 }}.</b> {{ lesson.nameLesson }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="cmt">
+    <button
+      (click)="openComment()"
+      mat-raised-button
+      color="primary"
+      class="pill-button"
+    >
+      <mat-icon>question_answer</mat-icon>
+      Hỏi đáp
+    </button>
+  </div>
+  <mat-drawer
+    class="comment-drawer"
+    position="end"
+    mode="over"
+    [opened]="showComment"
+    (closedStart)="closeComment()"
+  >
+    <div class="comment-header">
+      <button
+        style="background-color: #fff"
+        mat-icon-button
+        (click)="closeComment()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <app-comment-lesson *ngIf="showComment" [lessonId]="this.selectedLesson?.id">
+    </app-comment-lesson>
+  </mat-drawer>
+</mat-drawer-container>

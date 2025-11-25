@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Role } from '../../model/role';
-import { RoleService } from '../../service/role/role.service';
 import { CourseService } from '../../service/course/course.service';
 import { TokenStorageService } from '../../service/token-storage/token-storage.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AddCourseComponent } from './add-course/add-course.component';
-import { CourseCreateDto } from 'src/app/model/course';
-import { NgxNotificationDirection, NgxNotificationMsgService, NgxNotificationStatusMsg } from 'ngx-notification-msg';
+import { CourseCreateDto } from '../../model/course';
+import {
+  NgxNotificationDirection,
+  NgxNotificationMsgService,
+  NgxNotificationStatusMsg,
+} from 'ngx-notification-msg';
 
 @Component({
   selector: 'app-courses-management',
@@ -25,16 +27,14 @@ export class CoursesManagementComponent implements OnInit {
 
   courses: any[] = [];
   role: string = '';
-  ngOnInit(): void {
-    const user = this.tokenStorageService.getUser();
-
-    if (user.roles.includes('ROLE_ADMINISTRATOR')) {
+  ngOnInit() {
+    const user = this.tokenStorageService.getUser() ?? { roles: [] };
+    if (user?.roles?.includes('ROLE_ADMINISTRATOR'))
       this.role = 'ROLE_ADMINISTRATOR';
-    }
-  }
-  ngAfterViewInit(): void {
     this.getAllCourses();
   }
+
+  ngAfterViewInit(): void {}
   getAllCourses() {
     this.courseSvc.getAllCourses().subscribe((courses: any) => {
       this.courses = courses;
@@ -55,9 +55,9 @@ export class CoursesManagementComponent implements OnInit {
         error: (err) => {
           this.ngxNotificationMsgService.open({
             status: NgxNotificationStatusMsg.FAILURE,
-            header: 'Thêm mới khóa học',
+            header: 'Lỗi',
             messages: [err.error.message],
-            direction: NgxNotificationDirection.BOTTOM_RIGHT
+            direction: NgxNotificationDirection.BOTTOM_RIGHT,
           });
         },
       });
@@ -66,5 +66,4 @@ export class CoursesManagementComponent implements OnInit {
   getImageUrl(img: any) {
     return img || 'assets/course.jpg';
   }
-
 }

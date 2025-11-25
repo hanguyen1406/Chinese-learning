@@ -1,0 +1,53 @@
+<h1 mat-dialog-title>Thêm bài giảng</h1>
+
+<div mat-dialog-content>
+  <form [formGroup]="lessonForm">
+    <!-- Tên bài học -->
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Tên bài học</mat-label>
+      <input matInput formControlName="nameLesson" />
+      <mat-error *ngIf="lessonForm.get('nameLesson')?.hasError('required')">
+        Tên bài học là bắt buộc
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Nội dung bài học -->
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Nội dung bài học</mat-label>
+      <textarea matInput rows="4" formControlName="contentLesson"> </textarea>
+    </mat-form-field>
+
+    <!-- Link video -->
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Link video</mat-label>
+      <input matInput formControlName="linkVideo" />
+      <mat-error *ngIf="lessonForm.get('linkVideo')?.hasError('required')">
+        Link video là bắt buộc
+      </mat-error>
+      <mat-error *ngIf="lessonForm.get('linkVideo')?.hasError('pattern')">
+        Link phải bắt đầu bằng http:// hoặc https://
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Position -->
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Vị trí bài giảng</mat-label>
+      <input matInput type="number" formControlName="position" />
+      <mat-error *ngIf="lessonForm.get('position')?.hasError('required')">
+        Vị trí là bắt buộc
+      </mat-error>
+    </mat-form-field>
+  </form>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Hủy</button>
+  <button
+    [disabled]="lessonForm.invalid"
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+  >
+    Lưu
+  </button>
+</div>

@@ -1,0 +1,52 @@
+<div class="pl-2 pr-2">
+  <div class="d-flex">
+    <img src="assets/pr.jpg" alt="avatar" width="50" height="50" />
+    <input
+      [(ngModel)]="commentText"
+      (keyup.enter)="postComment()"
+      id="comment-input"
+      autocomplete="off"
+      class="flex-fill"
+    />
+  </div>
+  <div class="d-flex justify-content-end mt-1">
+    <button
+      class="btn"
+      mat-raised-button
+      color="primary"
+      (click)="postComment()"
+    >
+      Bình luận
+    </button>
+  </div>
+  <div
+    #cmtList
+    *ngIf="comments && comments.length > 0; else noComments"
+    class="cmtList"
+  >
+    <div class="mt-3" *ngFor="let cmt of comments">
+      <div class="d-flex mb-2">
+        <img src="assets/pr.jpg" alt="avatar" width="40" height="40" />
+        <div class="ml-2">
+          <b>{{ cmt.username }}</b>
+          <p class="mb-1">{{ cmt.contentCmt }}</p>
+          <div class="d-flex justify-content-end">
+            <small class="text-muted"
+              >{{ cmt.timeCmt | date : "dd/MM/yyyy HH:mm" }}
+            </small>
+            &nbsp;&nbsp;
+            <a>Trả lời</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #noComments>
+    <div class="text-center mt-3">
+      <h3>
+        Chưa có bình luận nào.<br />
+        Hãy là người đầu tiên bình luận!
+      </h3>
+    </div>
+  </ng-template>
+</div>

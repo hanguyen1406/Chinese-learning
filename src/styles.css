@@ -1,10 +1,12 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
 @import "~@fortawesome/fontawesome-free/css/all.min.css";
-@import 'material-icons/iconfont/material-icons.css';
-
+@import "material-icons/iconfont/material-icons.css";
 
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+.cdk-overlay-container {
+  z-index: 99999 !important;
 }
 

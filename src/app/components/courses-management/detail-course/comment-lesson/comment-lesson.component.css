@@ -1,0 +1,15 @@
+#comment-input {
+  background-color: #f2f9ff;
+  border: 0px;
+  border-radius: 10px;
+  padding: 5px;
+}
+.btn{
+    border-radius: 20px;
+    font-size: small;
+    background-color: #bb254a;
+}
+.cmtList{
+  height: 520px;
+  overflow-y: auto;
+}

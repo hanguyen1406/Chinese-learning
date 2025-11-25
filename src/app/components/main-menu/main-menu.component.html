@@ -26,11 +26,25 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="home" (click)="close()">TRANG CHỦ</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link pr-0" routerLink="coursestable" (click)="close()"
-            >KHÓA HỌC <i class="ml-1 mt-1 fa fa-caret-down"></i
-          ></a>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle pr-0"
+            href="#"
+            id="courseMenu"
+            role="button"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            KHÓA HỌC
+          </a>
+
+          <div class="dropdown-menu" aria-labelledby="courseMenu">
+            <a class="dropdown-item" routerLink="/coursestable">• CÁC KHÓA HỌC</a>
+            <a class="dropdown-item" routerLink="/quizs">• BÀI KIỂM TRA</a>
+          </div>
         </li>
+
         <li class="nav-item">
           <a class="nav-link" routerLink="home" (click)="close()">LIÊN HỆ</a>
         </li>
@@ -39,9 +53,6 @@
             >Quản trị ADMIN</a
           >
         </li>
-
-
-       
       </ul>
 
       <ul class="navbar-nav ml-auto" *ngIf="!isLoggedIn">
@@ -67,7 +78,12 @@
           }}</a>
         </li>
         <li class="nav-item">
-          <a style="white-space: nowrap; cursor: pointer;" class="nav-link" (click)="logout(); close()">Thoát</a>
+          <a
+            style="white-space: nowrap; cursor: pointer"
+            class="nav-link"
+            (click)="logout(); close()"
+            >Thoát</a
+          >
         </li>
       </ul>
     </div>
@@ -84,10 +100,8 @@
       Users
       <i class="fa fa-caret-down"></i>
     </button>
-
-
   </div>
-  <div class="container">
+  <div class="">
     <router-outlet></router-outlet>
   </div>
 </div>

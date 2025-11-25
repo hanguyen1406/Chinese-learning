@@ -2,8 +2,8 @@
   <div class="container">
     <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
       <div class="col">
-        <div class="card radius-10 border-start border-0 border-3 border-info">
-          <a [routerLink]="['/userstable']">
+        <div class="card radius-10 border-start border-0 border-3 border-info card-hover-effect">
+          <a class="text-decoration-none" [routerLink]="['/userstable']">
             <div class="card-body">
               <div class="d-flex align-items-center">
                 <div>
@@ -22,14 +22,14 @@
       </div>
       <div class="col">
         <div
-          class="card radius-10 border-start border-0 border-3 border-warning"
+          class="card radius-10 border-start border-0 border-3 border-warning card-hover-effect"
         >
-          <a [routerLink]="['/coursestable']">
+          <a class="text-decoration-none" [routerLink]="['/coursestable']">
             <div class="card-body">
               <div class="d-flex align-items-center">
                 <div>
                   <p class="mb-0 text-secondary">Quản lý Khóa học</p>
-                  <h4 class="my-1 text-warning">{{ this.countFaculty }}</h4>
+                  <h4 class="my-1 text-warning">{{ this.countCourses }}</h4>
                 </div>
                 <div
                   class="widgets-icons-2 rounded-circle bg-gradient-blooker text-white ms-auto"
@@ -41,21 +41,22 @@
           </a>
         </div>
       </div>
-    </div>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
       <div class="col">
-        <div class="card radius-10 border-start border-0 border-3 border-info">
-          <a [routerLink]="['/userstable']">
+        <div
+          class="card radius-10 border-start border-0 border-3 border-success card-hover-effect"
+        >
+          <a class="text-decoration-none" [routerLink]="['/quizs']">
             <div class="card-body">
               <div class="d-flex align-items-center">
                 <div>
-                  <p class="mb-0 text-secondary">Quản lý Khóa học</p>
-                  <h4 class="my-1 text-info">{{ this.countUsers }}</h4>
+                  <p class="mb-0 text-secondary">Quản lý Bài kiểm tra</p>
+                  <h4 class="my-1 text-success">{{ this.countQuiz }}</h4>
                 </div>
+
                 <div
-                  class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto"
+                  class="widgets-icons-2 rounded-circle bg-success text-white ms-auto"
                 >
-                  <i class="fa fa-users"></i>
+                  <i class="fa-solid fa-file-pen"></i>
                 </div>
               </div>
             </div>
