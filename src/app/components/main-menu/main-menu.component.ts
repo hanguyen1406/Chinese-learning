@@ -1,6 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-// import { SubjectNotifications } from 'src/app/model/subject-notifications';
-// import { FollowService } from 'src/app/service/follow-sub/follow.service';
+
 import { TokenStorageService } from '../../service/token-storage/token-storage.service';
 import {
   MatDialog,
@@ -8,13 +7,10 @@ import {
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-// import { SubjectNotificationsDialog } from './board-moderator/about-subject/about-subject.component';
-// import { StudentService } from 'src/app/service/student/student.service';
-// import { Student } from 'src/app/model/student';
-// import { ForumService } from 'src/app/service/forum/forum/forum.service';
-// import { Forum } from 'src/app/model/forum/forum';
-// import { Podforum } from 'src/app/model/forum/podforum';
+
 import { Router } from '@angular/router';
+import { LoadingService } from '../../service/loadingService';
+import { delay, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-main-menu',
@@ -27,20 +23,17 @@ export class MainMenuComponent implements OnInit {
 
   roleAdmin = false;
   roleProfessorOrAdmin = false;
-  roleProfessorOnly = false;
-  roleStudent = false;
 
   username: string;
-
-  subjectNotifications: any[] = [];
-  student: any = null;
-
-  forum: any = null;
-
+  isLoading$ = this.loadingService.isLoading$.pipe(
+    distinctUntilChanged(),
+    delay(0) // 👈 đẩy change sang tick sau, hết ExpressionChanged
+  );
   constructor(
     private tokenStorageService: TokenStorageService,
     public dialog: MatDialog,
-    private router: Router
+    private router: Router,
+    public loadingService: LoadingService
   ) {}
   isOpen = false;
   close() {
@@ -88,23 +81,12 @@ export class MainMenuComponent implements OnInit {
     }
   }
 
-  openNav() {
-    // document.getElementById("mySidebar").style.width = "250px";
-    // document.getElementById("main").style.marginLeft = "250px";
-  }
+  openNav() {}
 
   /* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
-  closeNav() {
-    // document.getElementById("mySidebar").style.width = "0";
-    // document.getElementById("main").style.marginLeft = "0";
-  }
+  closeNav() {}
 
-  readNotifications(notifications: any) {
-    this.subjectNotifications.forEach((value, index) => {
-      if (value['id'] == notifications['id'])
-        this.subjectNotifications.splice(index, 1);
-    }); //Izbacujemo iz liste notifikaciju koju smo otvorili
-  }
+  readNotifications(notifications: any) {}
 
   logout(): void {
     this.tokenStorageService.signOut();

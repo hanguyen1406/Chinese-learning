@@ -1,15 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Comment } from '../../model/comment';
+import { API_PATH } from '../../service/const';
 
-const API_URL = 'http://localhost:8080/api/lesson';
+const API_URL = `${API_PATH}/lesson`;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LessonService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   createLesson(lesson: any) {
     return this.http.post(API_URL, lesson);

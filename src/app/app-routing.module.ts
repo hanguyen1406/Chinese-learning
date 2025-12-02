@@ -11,6 +11,7 @@ import { UsersManagementComponent } from './components/users-management/users-ma
 import { CoursesManagementComponent } from './components/courses-management/courses-management.component';
 import { DetailCourseComponent } from './components/courses-management/detail-course/detail-course.component';
 import { QuizsManagementComponent } from './components/quizs-management/quizs-management.component';
+import { DetailQuizComponent } from './components/quizs-management/detail-quiz/detail-quiz.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -21,13 +22,19 @@ const routes: Routes = [
   { path: 'userstable', component: UsersManagementComponent },
   { path: 'coursestable', component: CoursesManagementComponent },
   { path: 'quizs', component: QuizsManagementComponent },
-  { path: 'coursestable/:idCourse', component: DetailCourseComponent},
+  { path: 'quizs/:idQuiz', component: DetailQuizComponent },
+  { path: 'coursestable/:idCourse', component: DetailCourseComponent },
   { path: 'userstable/createedituser', component: CreateEditUserComponent },
-  { path: '', redirectTo: 'home', pathMatch: 'full' }
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  imports: [
+    RouterModule.forRoot(routes, {
+      scrollPositionRestoration: 'top', // 👈 Tự cuộn lên đầu
+      anchorScrolling: 'enabled',
+    }),
+  ],
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

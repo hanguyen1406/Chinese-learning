@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -46,6 +46,12 @@ import { CommentLessonComponent } from './components/courses-management/detail-c
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { QuizsManagementComponent } from './components/quizs-management/quizs-management.component';
+import { AddQuizComponent } from './components/quizs-management/add-quiz/add-quiz.component';
+import { DetailQuizComponent } from './components/quizs-management/detail-quiz/detail-quiz.component';
+import { LoadingService } from './service/loadingService';
+import { LoadingInterceptor } from './helper/Loading.interceptor';
+import { CommonModule } from '@angular/common';
+import { AddQuestionComponent } from './components/quizs-management/detail-quiz/add-question/add-question.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +71,9 @@ import { QuizsManagementComponent } from './components/quizs-management/quizs-ma
     AddLessonComponent,
     CommentLessonComponent,
     QuizsManagementComponent,
+    AddQuizComponent,
+    DetailQuizComponent,
+    AddQuestionComponent,
   ],
   imports: [
     BrowserModule,
@@ -94,9 +103,18 @@ import { QuizsManagementComponent } from './components/quizs-management/quizs-ma
     MatDialogModule,
     MatBadgeModule,
     MatListModule,
-    MatSidenavModule
+    MatSidenavModule,
+    CommonModule,
+      
   ],
-  providers: [authInterceptorProviders],
+  providers: [
+    authInterceptorProviders,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: LoadingInterceptor,
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -2,8 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ERole, Role } from '../../model/role';
+import { API_PATH } from '../../service/const';
 
-const ROLE_URL = 'http://localhost:8080/api/roles/';
+const ROLE_URL = `${API_PATH}/roles/`;
 
 @Injectable({
   providedIn: 'root'

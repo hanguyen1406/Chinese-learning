@@ -40,7 +40,9 @@
           </a>
 
           <div class="dropdown-menu" aria-labelledby="courseMenu">
-            <a class="dropdown-item" routerLink="/coursestable">• CÁC KHÓA HỌC</a>
+            <a class="dropdown-item" routerLink="/coursestable"
+              >• CÁC KHÓA HỌC</a
+            >
             <a class="dropdown-item" routerLink="/quizs">• BÀI KIỂM TRA</a>
           </div>
         </li>
@@ -89,8 +91,6 @@
     </div>
   </nav>
 
-  <div></div>
-
   <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" (click)="closeNav()"
       >&times;</a
@@ -101,7 +101,101 @@
       <i class="fa fa-caret-down"></i>
     </button>
   </div>
-  <div class="">
+  <div style="min-height: 100vh">
+    <!-- loading overlay -->
+    <div *ngIf="isLoading$ | async" class="loading-overlay">
+      <div class="loader-orbit">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+
     <router-outlet></router-outlet>
   </div>
+  <footer
+    style="background-color: gainsboro"
+    class="footer-dark text-dark py-5"
+  >
+    <div class="container">
+      <div class="row">
+        <!-- Cột 1: Logo + thông tin công ty -->
+        <div class="col-md-5 mb-4">
+          <h4 class="text-center font-weight-bold mb-4">
+            Công Ty TNHH Giáo Dục<br />Hoa Ngữ
+          </h4>
+
+          <ul class="list-unstyled mb-0 footer-bullets">
+            <li>
+              <span class="d-block">
+                Địa chỉ: 3 Đ. Cầu Giấy, Ngọc Khánh, Đống Đa<br />
+                Hà Nội, Vietnam
+              </span>
+            </li>
+            <li>
+              Giấy chứng nhận ĐKKD số:
+              <span style="color: #aa8c53">012345678</span> do Phòng đăng ký
+              kinh doanh, Sở kế hoạch và đầu tư TPHN cấp ngày 20/10/2025.
+            </li>
+            <li>
+              Giấy phép hoạt động trung tâm ngoại ngữ TẦM NHÌN VIỆT số:
+              <span style="color: #aa8c53">2804/QĐ-GDĐT-TC</span> do Sở Giáo Dục
+              Và Đào Tạo TPHN cấp.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Cột 2: Liên hệ / Góp ý -->
+        <div class="col-md-4 mb-4">
+          <h4 class="text-center font-weight-bold mb-4">Liên Hệ - Góp Ý</h4>
+
+          <h5 class="font-weight-bold">Bộ phận tư vấn</h5>
+          <ul class="list-unstyled mb-4">
+            <li><span style="color: #aa8c53">Hotline:</span> 0123 456 789</li>
+            <li><span style="color: #aa8c53">Email:</span> hello@abc.edu.vn</li>
+            <li>
+              <span style="color: #aa8c53">Thời gian:</span> 08h00 - 21h00
+            </li>
+          </ul>
+
+          <h5 class="font-weight-bold">Góp ý - phản ánh</h5>
+          <ul class="list-unstyled mb-0">
+            <li><span style="color: #aa8c53">Hotline:</span> 0123 456 789</li>
+            <li><span style="color: #aa8c53">Email:</span> hello@abc.edu.vn</li>
+          </ul>
+        </div>
+
+        <!-- Cột 3: Chính sách + MXH -->
+        <div class="col-md-3 mb-4">
+          <h4 class="font-weight-bold mb-4">Chính Sách - Điều Khoản</h4>
+          <ul class="list-unstyled footer-links">
+            <li><i class="fas fa-arrow-right mr-2"></i> Bảo mật thông tin</li>
+            <li>
+              <i class="fas fa-arrow-right mr-2"></i> Hướng dẫn thanh toán
+            </li>
+            <li><i class="fas fa-arrow-right mr-2"></i> Hướng dẫn bảo lưu</li>
+            <li><i class="fas fa-arrow-right mr-2"></i> Điều khoản dịch vụ</li>
+          </ul>
+
+          <h4 class="font-weight-bold mt-4 mb-3">Theo dõi kênh MXH</h4>
+          <div class="d-flex">
+            <a href="#" class="social-ic mr-3"
+              ><i class="fab fa-facebook-f"></i
+            ></a>
+            <a href="#" class="social-ic mr-3"
+              ><i class="fab fa-instagram"></i
+            ></a>
+            <a href="#" class="social-ic mr-3"
+              ><i class="fab fa-youtube"></i
+            ></a>
+            <a href="#" class="social-ic mr-3"
+              ><i class="fab fa-linkedin-in"></i
+            ></a>
+            <a href="#" class="social-ic"><i class="fab fa-pinterest-p"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
 </div>

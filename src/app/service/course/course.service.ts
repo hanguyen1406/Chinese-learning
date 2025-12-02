@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { API_PATH } from '../../service/const';
 
-const API_URL = 'http://localhost:8080/api/course';
+const API_URL = `${API_PATH}/course`;
 
 @Injectable({
   providedIn: 'root',

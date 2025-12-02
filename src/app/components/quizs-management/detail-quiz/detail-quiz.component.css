@@ -1,0 +1,96 @@
+.lesson-card {
+  padding: 12px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+}
+.lesson-cards {
+  height: 420px;
+  overflow-y: auto;
+}
+.lesson-card.active {
+  border-left: 4px solid #2196f3;
+  background: #e3f2fd;
+}
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+.video-container {
+  padding-left: 200px;
+  overflow-y: auto;
+  height: 540px;
+}
+.pill-button {
+  border-radius: 999px !important;
+  padding-left: 22px !important;
+  padding-right: 22px !important;
+  background-color: #bb254a;
+  border: 0px;
+  /* shadow thêm vào */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18) !important;
+  transition: box-shadow 0.2s ease, transform 0.1s ease !important;
+}
+.lesson-content {
+  white-space: pre-line;
+}
+
+.pill-button:hover {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25) !important;
+}
+
+.pill-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.2) !important;
+}
+#cmt {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+.page-container {
+  height: 100vh;
+}
+
+.page-content {
+  height: 100%;
+}
+
+/* sidebar bình luận bên phải */
+.comment-drawer {
+  width: 33vw; /* ~1/3 màn hình */
+  max-width: 420px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 12px;
+  font-weight: 600;
+  margin-top: 55px;
+}
+
+.comment-body {
+  flex: 1;
+  padding: 10px 12px;
+  overflow-y: auto;
+}
+
+/* Ẩn scrollbar nhưng vẫn cuộn được (nếu muốn) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}

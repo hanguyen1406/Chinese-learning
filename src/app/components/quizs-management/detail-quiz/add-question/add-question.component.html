@@ -1,0 +1,88 @@
+<h2 mat-dialog-title>Thêm câu hỏi</h2>
+
+<mat-dialog-content [formGroup]="form" class="question-dialog">
+  <!-- Nội dung câu hỏi -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Nội dung câu hỏi</mat-label>
+    <textarea
+      matInput
+      rows="3"
+      formControlName="content"
+      placeholder="Nhập câu hỏi..."
+    ></textarea>
+    <mat-error *ngIf="form.get('content')?.hasError('required')">
+      Bắt buộc nhập nội dung câu hỏi
+    </mat-error>
+  </mat-form-field>
+
+  <!-- 4 đáp án -->
+  <div class="answers-wrapper">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Đáp án A</mat-label>
+      <input matInput formControlName="a" />
+      <mat-error *ngIf="form.get('a')?.hasError('required')">
+        Nhập nội dung đáp án A
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Đáp án B</mat-label>
+      <input matInput formControlName="b" />
+      <mat-error *ngIf="form.get('b')?.hasError('required')">
+        Nhập nội dung đáp án B
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Đáp án C</mat-label>
+      <input matInput formControlName="c" />
+      <mat-error *ngIf="form.get('c')?.hasError('required')">
+        Nhập nội dung đáp án C
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Đáp án D</mat-label>
+      <input matInput formControlName="d" />
+      <mat-error *ngIf="form.get('d')?.hasError('required')">
+        Nhập nội dung đáp án D
+      </mat-error>
+    </mat-form-field>
+  </div>
+
+  <!-- Chọn đáp án đúng -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Đáp án đúng</mat-label>
+    <mat-select formControlName="answer">
+      <mat-option value="a">A</mat-option>
+      <mat-option value="b">B</mat-option>
+      <mat-option value="c">C</mat-option>
+      <mat-option value="d">D</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Giải thích -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Giải thích (nếu có)</mat-label>
+    <textarea
+      matInput
+      rows="2"
+      formControlName="explanation"
+      placeholder="Giải thích đáp án đúng..."
+    ></textarea>
+  </mat-form-field>
+
+  <!-- Ảnh minh họa -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Image URL (tùy chọn → cho câu hỏi có hình ảnh)</mat-label>
+    <input matInput formControlName="image_url" placeholder="https://..." />
+    <mat-error *ngIf="form.get('image_url')?.hasError('pattern')">
+      URL phải bắt đầu bằng http:// hoặc https://
+    </mat-error>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Hủy</button>
+  <button mat-flat-button color="primary" (click)="onSave()">Lưu</button>
+</mat-dialog-actions>

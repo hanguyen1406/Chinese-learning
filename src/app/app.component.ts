@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { LoadingService } from './service/loadingService';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  
-  title = "Learning Management System";
+  title = 'Learning Management System';
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {}
-
 }

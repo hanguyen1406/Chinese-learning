@@ -4,7 +4,7 @@ import { CourseService } from '../../service/course/course.service';
 import { TokenStorageService } from '../../service/token-storage/token-storage.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AddCourseComponent } from './add-course/add-course.component';
-import { CourseCreateDto } from '../../model/course';
+import { Course } from '../../model/course';
 import {
   NgxNotificationDirection,
   NgxNotificationMsgService,
@@ -46,7 +46,7 @@ export class CoursesManagementComponent implements OnInit {
       disableClose: true,
     });
 
-    ref.afterClosed().subscribe((data?: CourseCreateDto) => {
+    ref.afterClosed().subscribe((data?: Course) => {
       if (!data) return; // user bấm Hủy
       this.courseSvc.createCourse(data).subscribe({
         next: () => {

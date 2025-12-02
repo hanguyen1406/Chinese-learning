@@ -22,14 +22,12 @@ export class BoardAdminComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private roleService: RoleService
-  ) {
-    this.userService.countUser("", "", "").subscribe((x : number) => { this.countUsers = x });
-    // this.professorService.getAll().subscribe(x => { this.countProfessors = x.length });
-    // this.studentService.getAll().subscribe(x => { this.countStudents = x.length });
-    // this.uni.getAll().subscribe(x=> { this.countUniversities = x.length });
-    // this.facultyService.getAll().subscribe(x=> { this.countFaculty = x.length });
-    // this.roleService.countAdministrator().subscribe((x: number) => { this.countAdministrators = x; } );
-  }
+  ) {}
 
   ngOnInit(): void {}
+  ngAfterViewInit() {
+    this.userService.countUser('', '', '').subscribe((x: any) => {
+      this.countUsers = x;
+    });
+  }
 }

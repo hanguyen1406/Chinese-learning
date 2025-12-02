@@ -1,0 +1,50 @@
+<h2 mat-dialog-title>Thêm bài kiểm tra</h2>
+
+<mat-dialog-content [formGroup]="form">
+  <div class="row">
+    <div class="col-12">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Tên bài kiểm tra</mat-label>
+        <input matInput formControlName="name" />
+        <mat-error *ngIf="f['name'].hasError('required')">
+          Tên không được để trống
+        </mat-error>
+        <mat-error *ngIf="f['name'].hasError('maxLength')">
+          Tên quá dài
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="col-6">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Thời gian làm bài (phút)</mat-label>
+        <input matInput type="number" formControlName="timeQuiz" />
+        <mat-error *ngIf="f['timeQuiz'].hasError('required')">
+          Vui lòng nhập thời gian làm bài
+        </mat-error>
+        <mat-error *ngIf="f['timeQuiz'].hasError('min')">
+          Thời gian phải lớn hơn 0
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="col-12">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Chọn khóa học</mat-label>
+
+        <mat-select formControlName="courseId">
+          <mat-option *ngFor="let c of courses" [value]="c.id">
+            {{ c.name }}
+          </mat-option>
+        </mat-select>
+
+        <mat-error *ngIf="form.controls['courseId'].hasError('required')">
+          Vui lòng chọn khóa học
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button color="primary" (click)="oncancel()">Hủy</button>
+  <button mat-raised-button color="primary" (click)="onSave()">Lưu</button>
+</mat-dialog-actions>

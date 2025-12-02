@@ -27,25 +27,85 @@
       <h2><b> Các bài kiểm tra </b></h2>
     </div>
 
-    <div *ngIf="quizs && quizs.length > 0; else noQuizs" class="row mt-4">
-      <div class="col-sm-6 col-lg-4 mb-4" *ngFor="let c of quizs">
-        <a [routerLink]="['/quizs', c.id]" class="text-decoration-none">
-          <div
-            style="border-radius: 15px; height: 280px"
-            class="shadow border-0 hover-move-card cursor-pointer"
-          >
-            <div class="card-body p-2">
-              <h4 class="card-title mb-1 text-truncate" [title]="c.name">
-                <b>
-                  <!-- {{ c.name }} -->
-                </b>
-              </h4>
-              <div class="text-danger font-weight-bold">Miễn phí</div>
-            </div>
-          </div>
-        </a>
+    <div
+      *ngIf="dataSource.data && dataSource.data.length > 0; else noQuizs"
+      class="mt-4"
+    >
+      <div class="table-scroll">
+        <table
+          class="full-width-table"
+          mat-table
+          [dataSource]="dataSource"
+          matSort
+        >
+          <!-- ID -->
+          <ng-container matColumnDef="id">
+            <th sticky mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+            <td mat-cell *matCellDef="let q">{{ q.id }}</td>
+          </ng-container>
+
+          <!-- Tên bài kiểm tra -->
+          <ng-container matColumnDef="name">
+            <th sticky mat-header-cell *matHeaderCellDef mat-sort-header>
+              Tên bài kiểm tra
+            </th>
+            <td mat-cell style="width: 300px" *matCellDef="let q">
+              <span class="text-truncate d-inline-block" [title]="q.name">
+                {{ q.name }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Thời gian -->
+          <ng-container matColumnDef="timeQuiz">
+            <th sticky mat-header-cell *matHeaderCellDef mat-sort-header>
+              Thời gian
+            </th>
+            <td mat-cell style="width: 200px" *matCellDef="let q">
+              {{ q.timeQuiz }} phút
+            </td>
+          </ng-container>
+
+          <!-- Course -->
+          <ng-container matColumnDef="courseName">
+            <th sticky mat-header-cell *matHeaderCellDef mat-sort-header>
+              Course
+            </th>
+            <td mat-cell style="width: 300px" *matCellDef="let q">
+              {{ q.courseName }}
+            </td>
+          </ng-container>
+
+          <!-- Số câu hỏi -->
+          <ng-container matColumnDef="numOfQues">
+            <th sticky mat-header-cell *matHeaderCellDef mat-sort-header>
+              Số câu hỏi
+            </th>
+            <td mat-cell *matCellDef="let q">{{ q.numOfQues }}</td>
+          </ng-container>
+
+          <!-- Actions -->
+          <ng-container matColumnDef="actions">
+            <th sticky mat-header-cell *matHeaderCellDef>Hành động</th>
+            <td mat-cell *matCellDef="let q">
+              <button mat-icon-button color="primary" [routerLink]="['/quizs', q.id]">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="onDelete(q)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
       </div>
     </div>
+
     <ng-template #noQuizs>
       <div class="text-center"><h3>Không có bài kiểm tra nào.</h3></div>
     </ng-template>

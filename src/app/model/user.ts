@@ -1,6 +1,5 @@
 // import { Professor } from "./professor";
 import { Role } from "./role";
-import { Student } from "./student";
 
 export interface User {
     id: number,
@@ -9,7 +8,5 @@ export interface User {
     username: string,
     email: string,
     password: string,
-    student:Student,
-    professor:any,
     roles: Set<Role>;
 }

@@ -1,0 +1,93 @@
+<div style="margin-top: 55px" class="container">
+  <header>
+    <nav>
+      <ol
+        *ngIf="role == 'ROLE_ADMINISTRATOR'"
+        class="breadcrumb repo-breadcrumb"
+      >
+        <li class="breadcrumb-item">
+          <a
+            href="/administrator"
+            [routerLink]="['/administrator']"
+            class="router-link-active"
+          >
+            Quản trị ADMIN
+          </a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="/quizs" [routerLink]="['/quizs']" class="router-link-active">
+            Danh sách Bài kiểm tra
+          </a>
+        </li>
+      </ol>
+    </nav>
+
+    <div class="row" *ngIf="role == 'ROLE_ADMINISTRATOR'">
+      <div class="col-md-10">
+        <h2 style="margin: 0px">
+          <b>{{ course?.name }} </b>
+        </h2>
+      </div>
+      <div class="col-md-2">
+        <button mat-raised-button color="primary" (click)="openCreate()">
+          Thêm mới câu hỏi
+        </button>
+      </div>
+    </div>
+    <div *ngIf="role != 'ROLE_ADMINISTRATOR'">
+      <br />
+      <h2><b> Khóa học miễn phí </b></h2>
+    </div>
+  </header>
+</div>
+<div class="row mt-2">
+  <!-- Vùng video + nội dung -->
+  <div class="col-md-9">
+
+    <div >
+      <div class="container mb-5" *ngIf="selectedQues">
+        <h4><b>Câu hỏi:</b></h4>
+        <p>{{ selectedQues.content }}</p>
+
+        <div *ngIf="selectedQues.imageUrl">
+          <img
+            [src]="selectedQues.imageUrl"
+            alt="Hình ảnh câu hỏi"
+            class="img-fluid mb-3"
+          />
+        </div>
+
+        <h5><b>Đáp án:</b></h5>
+        <ul>
+          <li>A. {{ selectedQues.a }}</li>
+          <li>B. {{ selectedQues.b }}</li>
+          <li>C. {{ selectedQues.c }}</li>
+          <li>D. {{ selectedQues.d }}</li>
+        </ul>
+
+        <p><b>Đáp án đúng:</b> {{ selectedQues.answer }}</p>
+
+        <div *ngIf="selectedQues.explanation">
+          <h5><b>Giải thích:</b></h5>
+          <p>{{ selectedQues.explanation }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vùng danh sách bài học bên phải -->
+  <div class="col-md-3">
+    <h3>Nội dung Khóa học</h3>
+
+    <div class="lesson-cards">
+      <div
+        *ngFor="let ques of questions; let i = index"
+        (click)="selectQues(lesson)"
+        class="lesson-card"
+        [ngClass]="{ active: ques === selectedQues }"
+      >
+        <b>Câu {{ i + 1 }}</b>
+      </div>
+    </div>
+  </div>
+</div>
