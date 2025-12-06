@@ -6,26 +6,19 @@
         class="breadcrumb repo-breadcrumb"
       >
         <li class="breadcrumb-item">
-          <a
-            href="/administrator"
-            [routerLink]="['/administrator']"
-            class="router-link-active"
-          >
-            Quản trị ADMIN
-          </a>
+          <a [routerLink]="['/administrator']">Quản trị ADMIN</a>
         </li>
         <li class="breadcrumb-item">
-          <a href="/quizs" [routerLink]="['/quizs']" class="router-link-active">
-            Danh sách Bài kiểm tra
-          </a>
+          <a [routerLink]="['/quizs']">Danh sách Bài kiểm tra</a>
         </li>
       </ol>
     </nav>
 
+    <!-- Header cho ADMIN -->
     <div class="row" *ngIf="role == 'ROLE_ADMINISTRATOR'">
       <div class="col-md-10">
-        <h2 style="margin: 0px">
-          <b>{{ course?.name }} </b>
+        <h2 style="margin: 0">
+          <b>Cập nhật bài kiểm tra: {{ quiz?.name }}</b>
         </h2>
       </div>
       <div class="col-md-2">
@@ -34,59 +27,157 @@
         </button>
       </div>
     </div>
-    <div *ngIf="role != 'ROLE_ADMINISTRATOR'">
-      <br />
-      <h2><b> Khóa học miễn phí </b></h2>
+
+    <!-- Header cho học sinh -->
+    <div
+      style="margin-top: 60px"
+      class="row align-items-center"
+      *ngIf="role != 'ROLE_ADMINISTRATOR'"
+    >
+      <div class="col-md-8">
+        <h2 style="margin: 0">
+          <b>Làm bài kiểm tra: {{ quiz?.name }}</b>
+        </h2>
+      </div>
+      <div class="col-md-4 text-right d-flex">
+        <mat-card color="primary" class="p-2 mr-1 text-center" style="font-weight: bold; width: 180px; background-color: rgb(237, 220, 188);">
+          Thời gian còn lại: {{ displayTime }}
+        </mat-card>
+        <mat-card color="" class="p-2 mr-1 text-center" style="font-weight: bold; width: 80px; background-color: limegreen;">
+          Nộp bài
+        </mat-card>
+        <mat-card color="primary" class="p-2 text-center" style="font-weight: bold; width: 80px; background-color: orangered;">
+          Hủy
+        </mat-card>
+      </div>
     </div>
   </header>
 </div>
+
 <div class="row mt-2">
-  <!-- Vùng video + nội dung -->
+  <!-- Question Form -->
   <div class="col-md-9">
+    <div *ngIf="questions.length > 0" class="content">
+      <form
+        [formGroup]="selectedQues"
+        (ngSubmit)="updateQuestion()"
+        *ngIf="selectedQues"
+      >
+        <div class="question-container">
+          <!-- Question Content -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Câu hỏi {{ currentQuestionIndex + 1 }}</mat-label>
+            <textarea matInput formControlName="content" rows="3"></textarea>
+            <mat-error>Vui lòng nhập nội dung câu hỏi</mat-error>
+          </mat-form-field>
 
-    <div >
-      <div class="container mb-5" *ngIf="selectedQues">
-        <h4><b>Câu hỏi:</b></h4>
-        <p>{{ selectedQues.content }}</p>
+          <!-- 4 Answers in 2x2 Grid with Radio -->
+          <mat-radio-group formControlName="answer">
+            <div class="answers-grid">
+              <div class="answer-row">
+                <mat-radio-button value="a" color="warn"></mat-radio-button>
+                <mat-form-field appearance="outline">
+                  <mat-label>Đáp án A</mat-label>
+                  <input matInput formControlName="a" />
+                </mat-form-field>
+              </div>
 
-        <div *ngIf="selectedQues.imageUrl">
-          <img
-            [src]="selectedQues.imageUrl"
-            alt="Hình ảnh câu hỏi"
-            class="img-fluid mb-3"
-          />
+              <div class="answer-row">
+                <mat-radio-button value="b" color="warn"></mat-radio-button>
+                <mat-form-field appearance="outline">
+                  <mat-label>Đáp án B</mat-label>
+                  <input matInput formControlName="b" />
+                </mat-form-field>
+              </div>
+
+              <div class="answer-row">
+                <mat-radio-button value="c" color="warn"></mat-radio-button>
+                <mat-form-field appearance="outline">
+                  <mat-label>Đáp án C</mat-label>
+                  <input matInput formControlName="c" />
+                </mat-form-field>
+              </div>
+
+              <div class="answer-row">
+                <mat-radio-button value="d" color="warn"></mat-radio-button>
+                <mat-form-field appearance="outline">
+                  <mat-label>Đáp án D</mat-label>
+                  <input matInput formControlName="d" />
+                </mat-form-field>
+              </div>
+            </div>
+          </mat-radio-group>
+
+          <!-- URL hình ảnh -->
+          <div class="row">
+            <div class="col-md-12">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>URL hình ảnh</mat-label>
+                <input
+                  matInput
+                  formControlName="image_url"
+                  placeholder="https://..."
+                />
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Explanation -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Giải thích đáp án đúng</mat-label>
+            <textarea
+              matInput
+              formControlName="explanation"
+              rows="2"
+            ></textarea>
+          </mat-form-field>
+
+          <!-- Image Preview -->
+          <div
+            *ngIf="selectedQues.get('image_url')?.value"
+            class="image-preview"
+          >
+            <img [src]="selectedQues.get('image_url')?.value" alt="Preview" />
+          </div>
+
+          <!-- Buttons -->
+          <div class="button-group" *ngIf="role == 'ROLE_ADMINISTRATOR'">
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="!isUpdating"
+              (click)="updateQuestion()"
+            >
+              <mat-icon>save</mat-icon>
+              Cập nhật
+            </button>
+            <button mat-stroked-button type="button" (click)="resetForm()">
+              <mat-icon>refresh</mat-icon>
+              Làm mới
+            </button>
+          </div>
         </div>
+      </form>
+    </div>
 
-        <h5><b>Đáp án:</b></h5>
-        <ul>
-          <li>A. {{ selectedQues.a }}</li>
-          <li>B. {{ selectedQues.b }}</li>
-          <li>C. {{ selectedQues.c }}</li>
-          <li>D. {{ selectedQues.d }}</li>
-        </ul>
-
-        <p><b>Đáp án đúng:</b> {{ selectedQues.answer }}</p>
-
-        <div *ngIf="selectedQues.explanation">
-          <h5><b>Giải thích:</b></h5>
-          <p>{{ selectedQues.explanation }}</p>
-        </div>
-      </div>
+    <!-- No question -->
+    <div *ngIf="questions.length == 0" class="d-flex justify-content-center">
+      <p>Bài kiểm tra chưa có câu hỏi nào.</p>
     </div>
   </div>
 
-  <!-- Vùng danh sách bài học bên phải -->
+  <!-- Question List Sidebar -->
   <div class="col-md-3">
-    <h3>Nội dung Khóa học</h3>
-
+    <h3>Danh sách câu hỏi</h3>
     <div class="lesson-cards">
       <div
         *ngFor="let ques of questions; let i = index"
-        (click)="selectQues(lesson)"
+        (click)="selectQues(ques, i)"
         class="lesson-card"
-        [ngClass]="{ active: ques === selectedQues }"
+        [ngClass]="{ active: isQuestionSelected(ques) }"
       >
-        <b>Câu {{ i + 1 }}</b>
+        <b>Câu hỏi {{ i + 1 }}</b>
       </div>
     </div>
   </div>

@@ -4,9 +4,8 @@ import { TokenStorageService } from '../../service/token-storage/token-storage.s
 import { AddQuizComponent } from './add-quiz/add-quiz.component';
 import { Quiz } from '../../model/quiz';
 import { QuizService } from '../../service/quiz/quiz.service';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-quizs-management',
   templateUrl: './quizs-management.component.html',
@@ -16,45 +15,70 @@ export class QuizsManagementComponent implements OnInit {
   constructor(
     private tokenStorageService: TokenStorageService,
     private dialog: MatDialog,
-    private quizService: QuizService
+    private quizService: QuizService,
+    private router: Router
   ) {}
+
   role: string = '';
-  quizs: any[] = [];
-  displayedColumns: string[] = [
-    'id',
-    'name',
-    'timeQuiz',
-    'courseName',
-    'numOfQues',
-    'actions',
-  ];
+  courses: any[] = []; // Dữ liệu đã phân loại theo Course
+  loading: boolean = false;
 
-  dataSource = new MatTableDataSource<Quiz>([]);
-  total = 0;
-  pageSize = 5;
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
   ngOnInit() {
     const user = this.tokenStorageService.getUser() ?? { roles: [] };
-    if (user?.roles?.includes('ROLE_ADMINISTRATOR'))
+    if (user?.roles?.includes('ROLE_ADMINISTRATOR')) {
       this.role = 'ROLE_ADMINISTRATOR';
+    }
   }
+
   ngAfterViewInit() {
     this.getAllQuizs();
   }
+
+  /**
+   * Lấy tất cả quiz và phân loại theo course
+   */
   getAllQuizs() {
-    this.quizService.getAllQuiz().subscribe((res: any) => {
-      this.dataSource.data = res;
-      this.total = res.length;
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
+    this.loading = true;
+
+    this.quizService.getAllQuiz().subscribe({
+      next: (res: Quiz[]) => {
+        // map theo courseName
+        const map: { [key: string]: Quiz[] } = {};
+
+        res.forEach((q) => {
+          if (!map[q.courseName]) {
+            map[q.courseName] = [];
+          }
+          map[q.courseName].push(q);
+        });
+
+        // Convert sang array để dùng trong *ngFor
+        this.courses = Object.keys(map).map((course) => ({
+          name: course,
+          quizList: map[course],
+        }));
+
+        this.loading = false;
+      },
+
+      error: () => {
+        this.loading = false;
+      },
     });
   }
-  page(event: any) {
-    // nếu backend phân trang thì xử lý ở đây
-    console.log(event);
+  scrollLeft(courseName: string) {
+    const el = document.getElementById('scroll-' + courseName);
+    if (el) el.scrollLeft -= 300; // tốc độ cuộn
   }
+
+  scrollRight(courseName: string) {
+    const el = document.getElementById('scroll-' + courseName);
+    if (el) el.scrollLeft += 300;
+  }
+
+  /**
+   * Mở dialog tạo quiz mới
+   */
   openCreate() {
     const dialogRef = this.dialog.open(AddQuizComponent, {
       width: '400px',
@@ -70,8 +94,15 @@ export class QuizsManagementComponent implements OnInit {
     });
   }
 
-  onDelete(item: any) {
-    console.log('Delete:', item);
-    // confirm + call API xóa
+  doQuiz(quizId: number) {
+    this.router.navigate(['/quizs', quizId]);
+  }
+  
+  onDelete(quiz: Quiz) {
+    if (confirm(`Bạn muốn xoá bài kiểm tra "${quiz.name}" ?`)) {
+      // this.quizService.deleteQuiz(quiz.id).subscribe(() => {
+      //   this.getAllQuizs();
+      // });
+    }
   }
 }

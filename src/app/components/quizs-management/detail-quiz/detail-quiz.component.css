@@ -1,3 +1,4 @@
+/* CSS cũ giữ nguyên */
 .lesson-card {
   padding: 12px;
   cursor: pointer;
@@ -11,19 +12,8 @@
   border-left: 4px solid #2196f3;
   background: #e3f2fd;
 }
-.video-wrapper {
-  position: relative;
-  width: 100%;
-  height: 500px;
-  iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-}
-.video-container {
+
+.content {
   padding-left: 200px;
   overflow-y: auto;
   height: 540px;
@@ -34,7 +24,6 @@
   padding-right: 22px !important;
   background-color: #bb254a;
   border: 0px;
-  /* shadow thêm vào */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18) !important;
   transition: box-shadow 0.2s ease, transform 0.1s ease !important;
 }
@@ -63,9 +52,8 @@
   height: 100%;
 }
 
-/* sidebar bình luận bên phải */
 .comment-drawer {
-  width: 33vw; /* ~1/3 màn hình */
+  width: 33vw;
   max-width: 420px;
   min-width: 260px;
   display: flex;
@@ -86,11 +74,85 @@
   overflow-y: auto;
 }
 
-/* Ẩn scrollbar nhưng vẫn cuộn được (nếu muốn) */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 .no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+/* ===== FORM STYLES ===== */
+.question-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* 4 Answers Grid (2x2) with Radio */
+.answers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.answer-row {
+  display: flex;
+  align-items: center;
+  height: 45px;
+}
+
+.answer-row mat-radio-button {
+  flex-shrink: 0;
+}
+
+.answer-row mat-form-field {
+  flex: 1;
+}
+
+/* Image Preview */
+.image-preview {
+  margin: 15px 0;
+  text-align: center;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Buttons */
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.button-group button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.button-group mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* Responsive - Stack on mobile */
+@media (max-width: 768px) {
+  .answers-grid {
+    grid-template-columns: 1fr;
+  }
 }

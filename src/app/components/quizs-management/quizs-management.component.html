@@ -1,113 +1,84 @@
 <div style="margin-top: 55px" class="container">
   <header>
+    <!-- Nếu là admin -->
     <nav>
       <ol
-        *ngIf="role == 'ROLE_ADMINISTRATOR'"
+        *ngIf="role === 'ROLE_ADMINISTRATOR'"
         class="breadcrumb repo-breadcrumb"
       >
         <li class="breadcrumb-item">
-          <a
-            href="/administrator"
-            [routerLink]="['/administrator']"
-            class="router-link-active"
-          >
-            Quản trị ADMIN
-          </a>
+          <a routerLink="/administrator">Quản trị ADMIN</a>
         </li>
       </ol>
     </nav>
 
-    <div class="box mb-3" *ngIf="role == 'ROLE_ADMINISTRATOR'">
+    <div class="box mb-3" *ngIf="role === 'ROLE_ADMINISTRATOR'">
       <button mat-raised-button color="primary" (click)="openCreate()">
         Thêm mới Bài kiểm tra
       </button>
     </div>
-    <div *ngIf="role != 'ROLE_ADMINISTRATOR'">
+
+    <div *ngIf="role !== 'ROLE_ADMINISTRATOR'">
       <br />
-      <h2><b> Các bài kiểm tra </b></h2>
+      <h2><b>Các bài kiểm tra</b></h2>
     </div>
 
-    <div
-      *ngIf="dataSource.data && dataSource.data.length > 0; else noQuizs"
-      class="mt-4"
-    >
-      <div class="table-scroll">
-        <table
-          class="full-width-table"
-          mat-table
-          [dataSource]="dataSource"
-          matSort
-        >
-          <!-- ID -->
-          <ng-container matColumnDef="id">
-            <th sticky mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
-            <td mat-cell *matCellDef="let q">{{ q.id }}</td>
-          </ng-container>
-
-          <!-- Tên bài kiểm tra -->
-          <ng-container matColumnDef="name">
-            <th sticky mat-header-cell *matHeaderCellDef mat-sort-header>
-              Tên bài kiểm tra
-            </th>
-            <td mat-cell style="width: 300px" *matCellDef="let q">
-              <span class="text-truncate d-inline-block" [title]="q.name">
-                {{ q.name }}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Thời gian -->
-          <ng-container matColumnDef="timeQuiz">
-            <th sticky mat-header-cell *matHeaderCellDef mat-sort-header>
-              Thời gian
-            </th>
-            <td mat-cell style="width: 200px" *matCellDef="let q">
-              {{ q.timeQuiz }} phút
-            </td>
-          </ng-container>
-
-          <!-- Course -->
-          <ng-container matColumnDef="courseName">
-            <th sticky mat-header-cell *matHeaderCellDef mat-sort-header>
-              Course
-            </th>
-            <td mat-cell style="width: 300px" *matCellDef="let q">
-              {{ q.courseName }}
-            </td>
-          </ng-container>
-
-          <!-- Số câu hỏi -->
-          <ng-container matColumnDef="numOfQues">
-            <th sticky mat-header-cell *matHeaderCellDef mat-sort-header>
-              Số câu hỏi
-            </th>
-            <td mat-cell *matCellDef="let q">{{ q.numOfQues }}</td>
-          </ng-container>
-
-          <!-- Actions -->
-          <ng-container matColumnDef="actions">
-            <th sticky mat-header-cell *matHeaderCellDef>Hành động</th>
-            <td mat-cell *matCellDef="let q">
-              <button mat-icon-button color="primary" [routerLink]="['/quizs', q.id]">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button color="warn" (click)="onDelete(q)">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-
-          <tr
-            mat-header-row
-            *matHeaderRowDef="displayedColumns; sticky: true"
-          ></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
+    <!-- Course Section List -->
+    <div *ngFor="let c of courses" class="course-section">
+      <!-- Course header -->
+      <div class="course-header">
+        <h3>Khóa học: {{ c.name }}</h3>
+        <span class="badge"> {{ c.quizList.length }} bài kiểm tra </span>
       </div>
+
+      <div class="quiz-wrapper">
+        <!-- Nút cuộn trái -->
+        <button class="scroll-btn left" (click)="scrollLeft(c.name)">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <!-- Danh sách quiz cuộn ngang -->
+        <div class="quiz-scroll" [id]="'scroll-' + c.name">
+          <div class="quiz-card" *ngFor="let q of c.quizList">
+            <div>
+              <a (click)="doQuiz(q.id)">
+                <h4 class="quiz-title" [title]="q.name">{{ q.name }}</h4>
+              </a>
+              <div class="quiz-info">
+                <div style="padding-left: 3px">
+                  ⏱
+                  <span style="margin-left: 3px"> {{ q.timeQuiz }} phút </span>
+                </div>
+                <div>❓ {{ q.numOfQues }} câu</div> 
+                <div (click)="doQuiz(q.id)" class="test"> Bắt đầu làm </div>
+              </div>
+            </div>
+
+            <!-- Nút sửa / xóa (Glass icon-btn) -->
+            <div *ngIf="role === 'ROLE_ADMINISTRATOR'" class="quiz-actions">
+              <div class="icon-btn delete-btn" (click)="onDelete(q)">
+                <mat-icon>close</mat-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nút cuộn phải -->
+        <button
+          *ngIf="c.quizList.length > 4"
+          class="scroll-btn right"
+          (click)="scrollRight(c.name)"
+        >
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+
+      <hr />
     </div>
 
-    <ng-template #noQuizs>
-      <div class="text-center"><h3>Không có bài kiểm tra nào.</h3></div>
-    </ng-template>
+    <!-- empty -->
+    <div *ngIf="courses.length === 0" class="text-center">
+      <h3>Không có bài kiểm tra nào.</h3>
+    </div>
   </header>
 </div>

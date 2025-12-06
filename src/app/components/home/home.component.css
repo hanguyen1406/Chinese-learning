@@ -83,7 +83,7 @@ ul {
 h1 {
   text-align: center;
 }
-::ng-deep .mat-card {
+.mat-card {
   margin-top: 90px;
   text-align: center;
   color: rgb(80, 80, 80);

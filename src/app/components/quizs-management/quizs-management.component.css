@@ -1,36 +1,161 @@
-.full-width-table {
-  max-height: 320px; /* Tương đương khoảng 5–6 dòng */
-  overflow-y: auto;
-  border-radius: 10px;
-  /* border: 1px solid #dee2e6; */
+.course-section {
+  margin-bottom: 30px;
+}
+
+.course-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.course-header h3 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.badge {
+  background: #1976d2;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+.test {
+  background: #bb254a;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  width: fit-content;
+  margin-left: 70px;
+  cursor: pointer;
+}
+.quiz-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 16px;
+  padding-bottom: 10px;
+  scroll-behavior: smooth;
+}
+
+.quiz-scroll::-webkit-scrollbar {
+  height: 5px;
+}
+
+.quiz-scroll::-webkit-scrollbar-thumb {
+  background: #bb254a;
+  border-radius: 4px;
+}
+
+.quiz-card {
+  min-width: 260px;
+  padding-top: 5px;
+  padding-right: 5px;
+  padding-left: 15px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+}
+
+.quiz-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  max-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quiz-info {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.quiz-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.icon-btn {
+  /* width: 36px; */
+  height: 36px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+
+.icon-btn mat-icon {
+  font-size: 20px;
+}
+
+
+.edit-btn mat-icon {
+  color: #1976d2;
+}
+
+.delete-btn mat-icon {
+  color: #d32f2f;
+}
+.quiz-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.25s;
+}
+
+.scroll-btn:hover {
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.scroll-btn.left {
+  left: -20px; /* chỉnh nếu muốn sát hơn */
+}
+
+.scroll-btn.right {
+  right: -20px;
+}
+
+.scroll-btn mat-icon {
+  color: #444;
+}
+
+.quiz-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 16px;
+  scroll-behavior: smooth;
+  padding: 10px 0;
   width: 100%;
 }
-
-/* Scrollbar đẹp hơn */
-.full-width-table::-webkit-scrollbar {
-  width: 6px;
-}
-
-.full-width-table::-webkit-scrollbar-thumb {
-  background: #b7c8d6;
-  border-radius: 10px;
-}
-
-tbody tr:hover {
-  background-color: #f1f7ff !important;
-  transition: 0.2s;
-}
-
-.table-scroll {
-  max-height: 400px;
-  overflow-y: auto;
-}
-::ng-deep .mat-cell {
-  /* border: 2px solid #dee2e6; */
-  padding: 3px;
-}
-.mat-row:hover {
-  background-color: #f5f5f5;
+a {
+  text-decoration: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }

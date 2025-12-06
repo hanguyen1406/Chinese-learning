@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { UserService } from '../../service/user/user.service';
 import { Router } from '@angular/router';
+import { TokenStorageService } from 'src/app/service/token-storage/token-storage.service';
 
 @Component({
   selector: 'app-home',
@@ -8,7 +9,11 @@ import { Router } from '@angular/router';
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(
+    private userService: UserService,
+    private router: Router,
+    private tokenStorageService: TokenStorageService
+  ) {}
 
   ngOnInit(): void {}
   ionViewDidLoad() {
@@ -21,7 +26,14 @@ export class HomeComponent implements OnInit {
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, 50);
   }
-
+  openStart() {
+    const user = this.tokenStorageService.getUser() ?? { roles: [] };
+    if (user.roles.length > 0) {
+      this.router.navigate(['/coursestable']);
+    } else {
+      this.router.navigate(['/register']);
+    }
+  }
   about(object: any) {
     console.log(object);
     this.router.navigate(

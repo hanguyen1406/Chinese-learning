@@ -62,8 +62,5 @@ export class UserService {
     return this.http.get(USER_URL + 'countUser', { params });
   }
 
-  //JUST FOR TEST
-  generate300Users() {
-    return this.http.get(USER_URL + 'generate300Users');
-  }
+  
 }

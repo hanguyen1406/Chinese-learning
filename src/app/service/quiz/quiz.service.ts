@@ -13,6 +13,9 @@ export class QuizService {
   createQuiz(quiz: Quiz) {
     return this.http.post(API_URL, quiz);
   }
+  getQuizById(id: number) {
+    return this.http.get<Quiz>(`${API_URL}/${id}`);
+  }
   updateQuiz(quiz: Quiz) {
     return this.http.put(API_URL, quiz);
   }

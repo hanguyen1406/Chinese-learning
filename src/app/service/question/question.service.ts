@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { API_PATH } from '../const';
-import { Question } from 'src/app/model/question';
+import { Question } from '../../model/question';
 
 const API_URL = `${API_PATH}/question`;
 @Injectable({
