@@ -40,13 +40,29 @@
         </h2>
       </div>
       <div class="col-md-4 text-right d-flex">
-        <mat-card color="primary" class="p-2 mr-1 text-center" style="font-weight: bold; width: 180px; background-color: rgb(237, 220, 188);">
+        <mat-card
+          color="primary"
+          class="p-2 mr-1 text-center"
+          style="
+            font-weight: bold;
+            width: 180px;
+            background-color: rgb(237, 220, 188);
+          "
+        >
           Thời gian còn lại: {{ displayTime }}
         </mat-card>
-        <mat-card color="" class="p-2 mr-1 text-center" style="font-weight: bold; width: 80px; background-color: limegreen;">
+        <mat-card
+          color=""
+          class="p-2 mr-1 text-center"
+          style="font-weight: bold; width: 80px; background-color: limegreen"
+        >
           Nộp bài
         </mat-card>
-        <mat-card color="primary" class="p-2 text-center" style="font-weight: bold; width: 80px; background-color: orangered;">
+        <mat-card
+          color="primary"
+          class="p-2 text-center"
+          style="font-weight: bold; width: 80px; background-color: orangered"
+        >
           Hủy
         </mat-card>
       </div>
@@ -67,7 +83,12 @@
           <!-- Question Content -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Câu hỏi {{ currentQuestionIndex + 1 }}</mat-label>
-            <textarea matInput formControlName="content" rows="3"></textarea>
+            <textarea
+              [readonly]="role !== 'ROLE_ADMINISTRATOR'"
+              matInput
+              formControlName="content"
+              rows="3"
+            ></textarea>
             <mat-error>Vui lòng nhập nội dung câu hỏi</mat-error>
           </mat-form-field>
 
@@ -78,7 +99,11 @@
                 <mat-radio-button value="a" color="warn"></mat-radio-button>
                 <mat-form-field appearance="outline">
                   <mat-label>Đáp án A</mat-label>
-                  <input matInput formControlName="a" />
+                  <input
+                    [readonly]="role !== 'ROLE_ADMINISTRATOR'"
+                    matInput
+                    formControlName="a"
+                  />
                 </mat-form-field>
               </div>
 
@@ -86,7 +111,11 @@
                 <mat-radio-button value="b" color="warn"></mat-radio-button>
                 <mat-form-field appearance="outline">
                   <mat-label>Đáp án B</mat-label>
-                  <input matInput formControlName="b" />
+                  <input
+                    [readonly]="role !== 'ROLE_ADMINISTRATOR'"
+                    matInput
+                    formControlName="b"
+                  />
                 </mat-form-field>
               </div>
 
@@ -94,7 +123,11 @@
                 <mat-radio-button value="c" color="warn"></mat-radio-button>
                 <mat-form-field appearance="outline">
                   <mat-label>Đáp án C</mat-label>
-                  <input matInput formControlName="c" />
+                  <input
+                    [readonly]="role !== 'ROLE_ADMINISTRATOR'"
+                    matInput
+                    formControlName="c"
+                  />
                 </mat-form-field>
               </div>
 
@@ -102,7 +135,11 @@
                 <mat-radio-button value="d" color="warn"></mat-radio-button>
                 <mat-form-field appearance="outline">
                   <mat-label>Đáp án D</mat-label>
-                  <input matInput formControlName="d" />
+                  <input
+                    [readonly]="role !== 'ROLE_ADMINISTRATOR'"
+                    matInput
+                    formControlName="d"
+                  />
                 </mat-form-field>
               </div>
             </div>
@@ -111,7 +148,7 @@
           <!-- URL hình ảnh -->
           <div class="row">
             <div class="col-md-12">
-              <mat-form-field appearance="outline" class="full-width">
+              <mat-form-field *ngIf="role === 'ROLE_ADMINISTRATOR'" appearance="outline" class="full-width">
                 <mat-label>URL hình ảnh</mat-label>
                 <input
                   matInput
@@ -123,7 +160,7 @@
           </div>
 
           <!-- Explanation -->
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field *ngIf="role === 'ROLE_ADMINISTRATOR'" appearance="outline" class="full-width">
             <mat-label>Giải thích đáp án đúng</mat-label>
             <textarea
               matInput
