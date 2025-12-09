@@ -51,6 +51,9 @@ export class DetailQuizComponent implements OnInit, OnDestroy {
     const user = this.tokenStorageService.getUser() ?? { roles: [] };
     if (user?.roles?.includes('ROLE_ADMINISTRATOR')) {
       this.role = 'ROLE_ADMINISTRATOR';
+    } else {
+      this.role = 'ROLE_USER';
+      this.checkDoing();
     }
     this.getQuizById();
     this.getAllQuestions();
@@ -60,7 +63,31 @@ export class DetailQuizComponent implements OnInit, OnDestroy {
       this.isUpdating = true;
     });
   }
-
+  checkDoing() {
+    this.quizService.checkDoing(+this.idQuiz).subscribe((res) => {
+      const questionsDoing = res;
+      if (res.length > 0) {
+        this.ngxNotificationMsgService.open({
+          status: NgxNotificationStatusMsg.INFO,
+          header: 'Thông báo',
+          messages: [
+            'Bạn đang làm bài thi này, vui lòng hoàn thành.',
+          ],
+          delay: 5000,
+          direction: NgxNotificationDirection.BOTTOM_RIGHT,
+        });
+      } else {
+        const result = window.confirm('Xác nhận làm bài kiểm tra này?');
+        if (result) {
+          // Người dùng nhấn OK
+          console.log('Người dùng nhấn OK');
+        } else {
+          // Người dùng nhấn Cancel
+          console.log('Người dùng nhấn Cancel');
+        }
+      }
+    });
+  }
   ngOnDestroy(): void {
     this.stopTimer();
   }

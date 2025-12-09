@@ -7,6 +7,6 @@ export interface Question {
   d: string;
   answer: 'a' | 'b' | 'c' | 'd';
   explanation?: string;
-  quizId: number;
+  quizId?: number;
   image_url?: string;
 }

@@ -53,6 +53,7 @@ import { LoadingInterceptor } from './helper/Loading.interceptor';
 import { CommonModule } from '@angular/common';
 import { AddQuestionComponent } from './components/quizs-management/detail-quiz/add-question/add-question.component';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @NgModule({
   declarations: [
@@ -106,7 +107,8 @@ import { MatRadioModule } from '@angular/material/radio';
     MatListModule,
     MatSidenavModule,
     CommonModule,
-    MatRadioModule
+    MatRadioModule,
+    MatTabsModule
   ],
   providers: [
     authInterceptorProviders,

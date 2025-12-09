@@ -18,3 +18,8 @@
 .answer-field {
   flex: 1;
 }
+.upload-text{
+  display: flex;
+  align-items: center; /* Center theo chiều dọc */
+  height: 30px;
+}
