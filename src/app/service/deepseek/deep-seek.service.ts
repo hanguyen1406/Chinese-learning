@@ -19,14 +19,14 @@ export class DeepSeekService {
 
       // 2. Tạo prompt như yêu cầu
       const prompt = this.createPromptForQuiz(textContent);
-      console.log('Prompt gửi đi:', prompt);
+      // console.log('Prompt gửi đi:', prompt);
 
       // 3. Gửi lên DeepSeek API
       const response = await this.sendToDeepSeek(prompt).toPromise();
       
       // 4. Parse kết quả
       const result = this.parseApiResponse(response);
-      console.log('Kết quả trả về từ API:', result);
+      // console.log('Kết quả trả về từ API:', result);
       
       return result;
       
@@ -34,15 +34,6 @@ export class DeepSeekService {
       console.error('Lỗi xử lý file:', error);
       throw error;
     }
-  }
-
-
-  // Làm sạch text content
-  private cleanTextContent(text: string): string {
-    return text
-      .replace(/\r\n/g, '\n') // Chuẩn hóa line breaks
-      .replace(/\n{3,}/g, '\n\n') // Giảm multiple line breaks
-      .trim();
   }
 
   // Tạo prompt như anh đã cung cấp
@@ -64,7 +55,7 @@ export class DeepSeekService {
 
     YÊU CẦU QUAN TRỌNG:
     1. Chỉ trả về duy nhất JSON, không thêm bất kỳ text nào khác
-    2. JSON phải đúng cú pháp
+    2. JSON phải đúng cú pháp, nếu từ tiếng trung sai thì sửa làm sao phải ra được JSON
     3. Đảm bảo answer chỉ là 'a', 'b', 'c', hoặc 'd'
     4. Explanation phải chi tiết, giải thích rõ tại sao đáp án đó đúng
 
@@ -82,7 +73,7 @@ export class DeepSeekService {
       message: prompt
     };
 
-    console.log('Gửi request đến DeepSeek API với payload:', payload);
+    // console.log('Gửi request đến DeepSeek API với payload:', payload);
     
     return this.http.post(`${API_URL}/chat`, payload);
   }
@@ -90,16 +81,16 @@ export class DeepSeekService {
   // Parse response từ API
   private parseApiResponse(response: any): any {
     try {
-      console.log('Raw API response:', response);
+      // console.log('Raw API response:', response);
       
       // Lấy content từ response
-      const content = response.choices[0]?.message?.content;
+      const content = response.message;
       
       if (!content) {
         throw new Error('API không trả về content');
       }
 
-      console.log('API content:', content);
+      // console.log('API content:', content);
 
       // Cố gắng parse JSON
       // Có thể API trả về text chứa JSON, cần extract
@@ -114,7 +105,7 @@ export class DeepSeekService {
       
     } catch (error) {
       console.error('Lỗi parse API response:', error);
-      console.log('Raw content để debug:', response.choices[0]?.message?.content);
+      // console.log('Raw content để debug:', response.choices[0]?.message?.content);
       
       // Fallback: Trả về mảng rỗng
       return [];

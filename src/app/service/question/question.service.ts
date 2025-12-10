@@ -13,6 +13,9 @@ export class QuestionService {
   create(question: Question) {
     return this.http.post(API_URL, question);
   }
+  createBatch(question: Question[]) {
+    return this.http.post(`${API_URL}/batch`, question);
+  }
   update(question: Question) {
     return this.http.put(API_URL, question);
   }

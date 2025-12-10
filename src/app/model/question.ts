@@ -5,7 +5,8 @@ export interface Question {
   b: string;
   c: string;
   d: string;
-  answer: 'a' | 'b' | 'c' | 'd';
+  answer?: string;
+  userAnswer?: string;
   explanation?: string;
   quizId?: number;
   image_url?: string;

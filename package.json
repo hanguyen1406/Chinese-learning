@@ -28,6 +28,7 @@
     "material-icons": "^1.13.14",
     "ngx-notification-msg": "^0.2.2",
     "rxjs": "~6.5.5",
+    "sweetalert2": "^11.26.4",
     "xlsx": "^0.18.5",
     "zone.js": "~0.10.3"
   },

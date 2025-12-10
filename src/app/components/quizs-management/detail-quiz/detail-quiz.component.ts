@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { TokenStorageService } from '../../../service/token-storage/token-storage.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AddQuestionComponent } from './add-question/add-question.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Question } from '../../../model/question';
@@ -14,6 +14,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Quiz } from '../../../model/quiz';
 import { QuizService } from '../../../service/quiz/quiz.service';
 import { interval, Subscription } from 'rxjs';
+import { AnswerQuestion } from '../../../model/answerQuestion';
+import { ScoreQuiz } from '../../../model/scoreQuiz';
 
 @Component({
   selector: 'app-detail-quiz',
@@ -29,16 +31,20 @@ export class DetailQuizComponent implements OnInit, OnDestroy {
   isUpdating = false;
   currentQuestionId: number | null = null;
   currentQuestionIndex: number = 0;
-
+  isReviewMode = false;
+  correctAnswer = ''; // lấy từ backend
+  userAnswer = '';
   // Timer
   displayTime: string = '00:00';
   private timerSubscription!: Subscription;
   private timeLeft: number = 0; // tính bằng giây
+  score: number = 0;
 
   constructor(
     private tokenStorageService: TokenStorageService,
     private route: ActivatedRoute,
     private dialog: MatDialog,
+    private router: Router,
     private questionService: QuestionService,
     private quizService: QuizService,
     private readonly ngxNotificationMsgService: NgxNotificationMsgService,
@@ -53,10 +59,30 @@ export class DetailQuizComponent implements OnInit, OnDestroy {
       this.role = 'ROLE_ADMINISTRATOR';
     } else {
       this.role = 'ROLE_USER';
-      this.checkDoing();
+      let view = this.route.snapshot.queryParamMap.get('view'); // → 'result'
+      // console.log('view',view);
+
+      if (view && view == 'result') {
+        this.getResultQuiz();
+      } else {
+        this.getAllQuestions();
+      }
+      this.selectedQues.get('answer')?.valueChanges.subscribe((newValue) => {
+        // console.log('User selected answer:', newValue);
+        this.questions[this.currentQuestionIndex].answer = newValue;
+        //gọi api cập nhật lựa chọn của user
+        let answerQuestion: AnswerQuestion = {
+          id: null,
+          userId: null,
+          quizId: +this.idQuiz,
+          questionId: this.currentQuestionId!,
+          userAnswer: newValue,
+          answeredAt: new Date(),
+        };
+        this.quizService.answerQuestion(answerQuestion).subscribe((res) => {});
+      });
     }
     this.getQuizById();
-    this.getAllQuestions();
 
     // Lắng nghe mọi thay đổi trong FormGroup
     this.selectedQues.valueChanges.subscribe(() => {
@@ -64,28 +90,50 @@ export class DetailQuizComponent implements OnInit, OnDestroy {
     });
   }
   checkDoing() {
-    this.quizService.checkDoing(+this.idQuiz).subscribe((res) => {
-      const questionsDoing = res;
-      if (res.length > 0) {
+    this.quizService.checkDoing(+this.idQuiz).subscribe({
+      next: (res) => {
+        this.questions.forEach((q) => {
+          const answeredQues = res.questions.find((r) => r.id === q.id);
+          if (answeredQues) {
+            q.answer = answeredQues.answer;
+          }
+        });
+        this.selectQues(this.questions[0]);
+        this.startTimer(res.timeLeft); // res.timeLeft tính bằng phút
         this.ngxNotificationMsgService.open({
           status: NgxNotificationStatusMsg.INFO,
           header: 'Thông báo',
-          messages: [
-            'Bạn đang làm bài thi này, vui lòng hoàn thành.',
-          ],
+          messages: ['Bạn đang làm bài thi này, vui lòng hoàn thành.'],
           delay: 5000,
           direction: NgxNotificationDirection.BOTTOM_RIGHT,
         });
-      } else {
+      },
+      error: (err) => {
         const result = window.confirm('Xác nhận làm bài kiểm tra này?');
         if (result) {
-          // Người dùng nhấn OK
-          console.log('Người dùng nhấn OK');
+          // Người dùng nhấn OK là xác nhận làm bài, gọi API cập nhật 1 câu hỏi
+          // để lưu thời gian người dùng bắt đầu làm bài
+          const startTime = new Date(); // thời điểm bắt đầu
+          const finishedAt = new Date(
+            startTime.getTime() + this.quiz.timeQuiz * 60 * 1000
+          );
+
+          let scoreQuiz: ScoreQuiz = {
+            id: null,
+            quizId: +this.idQuiz,
+            userId: null,
+            score: null,
+            started_at: startTime,
+            finished_at: finishedAt,
+          };
+          this.quizService.doingQuiz(scoreQuiz).subscribe((res) => {
+            this.startTimer(this.quiz.timeQuiz * 60); // chuyển phút -> giây
+          });
         } else {
           // Người dùng nhấn Cancel
-          console.log('Người dùng nhấn Cancel');
+          this.router.navigate(['/quizs']);
         }
-      }
+      },
     });
   }
   ngOnDestroy(): void {
@@ -111,8 +159,8 @@ export class DetailQuizComponent implements OnInit, OnDestroy {
   }
 
   // Timer
-  startTimer(minutes: number) {
-    this.timeLeft = minutes * 60; // phút -> giây
+  startTimer(seconds: number) {
+    this.timeLeft = seconds; // phút -> giây
     this.updateDisplayTime();
 
     const timer$ = interval(1000); // tick mỗi giây
@@ -151,16 +199,47 @@ export class DetailQuizComponent implements OnInit, OnDestroy {
       messages: ['Thời gian làm bài đã kết thúc!'],
       direction: NgxNotificationDirection.BOTTOM_RIGHT,
     });
-    // TODO: gọi hàm submit tự động nếu muốn
+    this.submitQuiz();
   }
-
+  getResultQuiz() {
+    this.isReviewMode = true;
+    this.quizService.getResultQuiz(+this.idQuiz).subscribe({
+      next: (res) => {
+        this.questions = res.questions;
+        this.score = res.score;
+        this.selectQues(this.questions[0]);
+      },
+      error: (err) => {
+        this.ngxNotificationMsgService.open({
+          status: NgxNotificationStatusMsg.FAILURE,
+          header: 'Lỗi',
+          messages: [err.error?.message || 'Lấy kết quả thất bại'],
+          direction: NgxNotificationDirection.BOTTOM_RIGHT,
+        });
+      },
+    });
+  }
+  submitQuiz() {
+    //cập nhật finished_at
+    this.stopTimer();
+    this.quizService.submitQuiz(+this.idQuiz).subscribe({
+      next: (res) => {
+        this.getResultQuiz();
+      },
+      error: (err) => {
+        this.ngxNotificationMsgService.open({
+          status: NgxNotificationStatusMsg.FAILURE,
+          header: 'Lỗi',
+          messages: [err.error?.message || 'Có lỗi khi nộp bài'],
+          direction: NgxNotificationDirection.BOTTOM_RIGHT,
+        });
+      },
+    });
+  }
   // Lấy quiz
   getQuizById() {
     this.quizService.getQuizById(+this.idQuiz).subscribe((res) => {
       this.quiz = res;
-      if (this.role != 'ROLE_ADMINISTRATOR' && this.quiz?.timeQuiz) {
-        this.startTimer(this.quiz.timeQuiz); // Bắt đầu countdown cho học sinh
-      }
     });
   }
 
@@ -169,6 +248,9 @@ export class DetailQuizComponent implements OnInit, OnDestroy {
       this.questions = res;
       if (res.length > 0) {
         this.selectQues(res[0]);
+        if (this.role == 'ROLE_USER') {
+          this.checkDoing();
+        }
       }
     });
   }
@@ -176,7 +258,15 @@ export class DetailQuizComponent implements OnInit, OnDestroy {
   selectQues(ques: Question, index?: number) {
     this.currentQuestionId = ques.id || null;
     this.currentQuestionIndex = index !== undefined ? index : 0;
-    this.selectedQues.patchValue(ques);
+    if (this.role == 'ROLE_USER' && this.isReviewMode) {
+      this.correctAnswer = ques.answer || '';
+      this.userAnswer = ques.userAnswer || '';
+    }
+    this.selectedQues.patchValue(
+      { answer: '', image_url: '' },
+      { emitEvent: false }
+    );
+    this.selectedQues.patchValue(ques, { emitEvent: false });
     this.isUpdating = false;
   }
 
@@ -249,34 +339,67 @@ export class DetailQuizComponent implements OnInit, OnDestroy {
       width: '600px',
     });
 
-    dialogRef.afterClosed().subscribe((result: Question | undefined) => {
+    dialogRef.afterClosed().subscribe((result: Question | Question[]) => {
       if (result) {
-        result.quizId = +this.idQuiz;
-
-        this.questionService.create(result).subscribe({
-          next: (newQuestion) => {
-            this.questions.push(newQuestion as Question);
-
-            this.ngxNotificationMsgService.open({
-              status: NgxNotificationStatusMsg.SUCCESS,
-              header: 'Thành công',
-              messages: ['Thêm câu hỏi thành công'],
-              direction: NgxNotificationDirection.BOTTOM_RIGHT,
-            });
-          },
-          error: (err) => {
-            this.ngxNotificationMsgService.open({
-              status: NgxNotificationStatusMsg.FAILURE,
-              header: 'Lỗi',
-              messages: [err.error?.message || 'Thêm câu hỏi thất bại'],
-              direction: NgxNotificationDirection.BOTTOM_RIGHT,
-            });
-          },
-        });
+        if (Array.isArray(result)) {
+          // result là mảng Question[]
+          result.forEach((q) => {
+            q.quizId = +this.idQuiz;
+            q.answer = q.answer?.toLowerCase();
+          });
+          this.questionService.createBatch(result).subscribe({
+            next: (newQuestion) => {
+              this.getAllQuestions();
+              this.ngxNotificationMsgService.open({
+                status: NgxNotificationStatusMsg.SUCCESS,
+                header: 'Thành công',
+                messages: ['Thêm câu hỏi thành công'],
+                direction: NgxNotificationDirection.BOTTOM_RIGHT,
+              });
+            },
+            error: (err) => {
+              this.ngxNotificationMsgService.open({
+                status: NgxNotificationStatusMsg.FAILURE,
+                header: 'Lỗi',
+                messages: [err.error?.message || 'Thêm câu hỏi thất bại'],
+                direction: NgxNotificationDirection.BOTTOM_RIGHT,
+              });
+            },
+          });
+        } else {
+          // result là 1 Question duy nhất
+          result.quizId = +this.idQuiz;
+          this.questionService.create(result).subscribe({
+            next: (newQuestion) => {
+              this.getAllQuestions();
+              this.ngxNotificationMsgService.open({
+                status: NgxNotificationStatusMsg.SUCCESS,
+                header: 'Thành công',
+                messages: ['Thêm câu hỏi thành công'],
+                direction: NgxNotificationDirection.BOTTOM_RIGHT,
+              });
+            },
+            error: (err) => {
+              this.ngxNotificationMsgService.open({
+                status: NgxNotificationStatusMsg.FAILURE,
+                header: 'Lỗi',
+                messages: [err.error?.message || 'Thêm câu hỏi thất bại'],
+                direction: NgxNotificationDirection.BOTTOM_RIGHT,
+              });
+            },
+          });
+        }
       }
     });
   }
-
+  reDoQuiz() {
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['/quizs', this.idQuiz], { queryParams: {} });
+    });
+  }
+  exit() {
+    this.router.navigate(['/quizs']);
+  }
   isQuestionSelected(ques: Question): boolean {
     return this.currentQuestionId === ques.id;
   }

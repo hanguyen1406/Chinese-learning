@@ -23,3 +23,9 @@
   align-items: center; /* Center theo chiều dọc */
   height: 30px;
 }
+.format-details{
+  display: flex;
+}
+.answers-grid{
+  width: 536px;
+}

@@ -18,25 +18,26 @@ export class TokenStorageService {
   constructor(private router: Router) {}
 
   signOut(): void {
-    window.sessionStorage.clear();
+    window.localStorage.clear(); // ✅ đổi từ session -> local
   }
 
   public saveToken(token: string): void {
-    window.sessionStorage.removeItem(TOKEN_KEY);
-    window.sessionStorage.setItem(TOKEN_KEY, token);
+    window.localStorage.removeItem(TOKEN_KEY); // ✅
+    window.localStorage.setItem(TOKEN_KEY, token); // ✅
   }
 
   public getToken(): any {
-    return sessionStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem(TOKEN_KEY); // ✅
   }
 
-  public saveUser(user): void {
-    window.sessionStorage.removeItem(USER_KEY);
-    window.sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+  public saveUser(user: any): void {
+    window.localStorage.removeItem(USER_KEY); // ✅
+    window.localStorage.setItem(USER_KEY, JSON.stringify(user)); // ✅
   }
 
   public getUser(): any {
-    return JSON.parse(sessionStorage.getItem(USER_KEY));
+    const user = localStorage.getItem(USER_KEY); // ✅
+    return user ? JSON.parse(user) : null;
   }
 
   isTokenExpired(token?: string | null): boolean {
@@ -45,22 +46,18 @@ export class TokenStorageService {
       if (!token) return true;
 
       const payload = this.decodeJwt(token);
-      if (!payload?.exp) return true; // Không có exp => coi như hết hạn
+      if (!payload?.exp) return true;
 
       const nowSec = Math.floor(Date.now() / 1000);
       console.log('Token exp:', payload.exp, 'Now:', nowSec);
 
-      return nowSec >= payload.exp; // now >= exp => HẾT HẠN
+      return nowSec >= payload.exp;
     } catch (e) {
       console.error('JWT decode error:', e);
-      return true; // Lỗi giải mã => coi như invalid
+      return true;
     }
   }
 
-  /**
-   * Decode payload của JWT.
-   * KHÔNG verify signature (front-end không verify được).
-   */
   private decodeJwt(token: string): JwtPayload {
     const parts = token.split('.');
     if (parts.length !== 3) throw new Error('Invalid JWT format');
@@ -68,7 +65,7 @@ export class TokenStorageService {
     const base64Url = parts[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
 
-    const json = atob(base64); // decode base64
-    return JSON.parse(json); // parse payload
-  } 
+    const json = atob(base64);
+    return JSON.parse(json);
+  }
 }

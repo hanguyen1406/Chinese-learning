@@ -7,7 +7,7 @@
     <mat-tab label="Nhập thủ công">
       <div class="tab-content" [formGroup]="form">
         <!-- Nội dung câu hỏi -->
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="full-width mt-2">
           <mat-label>Nội dung câu hỏi</mat-label>
           <textarea
             matInput
@@ -22,29 +22,32 @@
 
         <!-- 4 đáp án -->
         <div class="answers-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>Đáp án A</mat-label>
-            <input matInput formControlName="a" />
-            <mat-error>Nhập đáp án A</mat-error>
-          </mat-form-field>
+          <div class="d-flex justify-content-between">
+            <mat-form-field style="width: 48%" appearance="outline">
+              <mat-label>Đáp án A</mat-label>
+              <input matInput formControlName="a" />
+              <mat-error>Nhập đáp án A</mat-error>
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Đáp án B</mat-label>
-            <input matInput formControlName="b" />
-            <mat-error>Nhập đáp án B</mat-error>
-          </mat-form-field>
+            <mat-form-field style="width: 48%" appearance="outline">
+              <mat-label>Đáp án B</mat-label>
+              <input matInput formControlName="b" />
+              <mat-error>Nhập đáp án B</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="d-flex justify-content-between">
+            <mat-form-field style="width: 48%" appearance="outline">
+              <mat-label>Đáp án C</mat-label>
+              <input matInput formControlName="c" />
+              <mat-error>Nhập đáp án C</mat-error>
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Đáp án C</mat-label>
-            <input matInput formControlName="c" />
-            <mat-error>Nhập đáp án C</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Đáp án D</mat-label>
-            <input matInput formControlName="d" />
-            <mat-error>Nhập đáp án D</mat-error>
-          </mat-form-field>
+            <mat-form-field style="width: 48%" appearance="outline">
+              <mat-label>Đáp án D</mat-label>
+              <input matInput formControlName="d" />
+              <mat-error>Nhập đáp án D</mat-error>
+            </mat-form-field>
+          </div>
         </div>
 
         <!-- Đáp án đúng -->
@@ -84,18 +87,19 @@
       </div>
     </mat-tab>
 
-    <!-- Tab 2: Upload Word -->
-    <mat-tab label="Upload Word">
+    <!-- Tab 2: Upload Word/Excel -->
+    <mat-tab label="Upload File">
       <div class="tab-content upload-section">
         <!-- Download Template -->
         <div class="template-section mt-1">
           <div>
-            <p>Tải file Word mẫu để nhập câu hỏi nhanh hơn</p>
+            <p>Tải file mẫu để nhập câu hỏi nhanh hơn</p>
           </div>
           <button
             mat-stroked-button
             color="primary"
             (click)="downloadTemplate()"
+            matTooltip="Tải file mẫu Word hoặc Excel"
           >
             <mat-icon>download</mat-icon>
             Tải file mẫu
@@ -115,19 +119,25 @@
             #fileInput
             type="file"
             hidden
-            accept=".docx"
+            [accept]="supportedFileTypes"
             (change)="onFileSelected($event)"
           />
 
           <p class="upload-text">
-            Kéo thả file Word vào đây hoặc click
-            <mat-icon class="upload-icon m-1">cloud_upload</mat-icon> để chọn file
+            Kéo thả file Word/Excel vào đây hoặc click
+            <mat-icon class="upload-icon m-1">cloud_upload</mat-icon> để chọn
+            file (Hỗ trợ .docx, .xlsx)
           </p>
-          <p class="upload-hint">Hỗ trợ: .docx</p>
+        </div>
+
+        <!-- Processing Indicator -->
+        <div *ngIf="isProcessing" class="processing-indicator">
+          <mat-spinner diameter="30"></mat-spinner>
+          <span class="processing-text">Đang xử lý file...</span>
         </div>
 
         <!-- Selected File Info -->
-        <div *ngIf="selectedFile" class="file-info">
+        <div *ngIf="selectedFile && !isProcessing" class="d-flex">
           <mat-icon color="primary">insert_drive_file</mat-icon>
           <div class="file-details">
             <p class="file-name">{{ selectedFile.name }}</p>
@@ -140,11 +150,14 @@
 
         <!-- Preview Questions -->
         <div *ngIf="previewQuestions.length > 0" class="preview-section">
-          <div class="preview-header">
-            <h4>Preview {{ previewQuestions.length }} câu hỏi</h4>
-            <button mat-button color="warn" (click)="clearPreview()">
-              Xóa tất cả
-            </button>
+          <div class="d-flex align-items-center">
+            <h4 class="m-0">Preview {{ previewQuestions.length }} câu hỏi</h4>
+            <div class="preview-actions">
+              <button mat-button color="warn" (click)="clearPreview()">
+                <mat-icon>delete_sweep</mat-icon>
+                Xóa tất cả
+              </button>
+            </div>
           </div>
 
           <div class="preview-list">
@@ -152,30 +165,66 @@
               *ngFor="let q of previewQuestions; let i = index"
               class="preview-item"
             >
-              <span class="preview-number">{{ i + 1 }}</span>
               <div class="preview-content">
-                <p class="preview-question">{{ q.content }}</p>
-                <span class="preview-answer">Đáp án: {{ q.answer }}</span>
+                <p class="m-0">
+                  <b> {{ i + 1 }}. {{ q.content }} </b>
+                  <button
+                    mat-icon-button
+                    (click)="removePreviewItem(i)"
+                    class="delete-btn"
+                  >
+                    <mat-icon color="warn">delete</mat-icon>
+                  </button>
+                </p>
+                <div class="preview-answers">
+                  <span class="answer-label">A:</span> {{ q.a }}<br />
+                  <span class="answer-label">B:</span> {{ q.b }}<br />
+                  <span class="answer-label">C:</span> {{ q.c }}<br />
+                  <span class="answer-label">D:</span> {{ q.d }}
+                </div>
+                <div>
+                  <span class="d-flex align-items-center">
+                    <mat-icon class="correct-icon">check_circle</mat-icon>
+                    Đáp án: {{ q.answer }}
+                  </span>
+                  <span *ngIf="q.explanation" class="preview-explanation">
+                    Giải thích: {{ q.explanation }}
+                  </span>
+                </div>
               </div>
-              <button mat-icon-button (click)="removePreviewItem(i)">
-                <mat-icon>delete</mat-icon>
-              </button>
             </div>
           </div>
         </div>
 
-        <!-- Word Format Info -->
-        <div class="format-info">
-          <mat-icon>info</mat-icon>
+        <!-- File Format Info -->
+        <div class="format-info mt-2">
           <div>
-            <p><strong>Định dạng file Word:</strong></p>
-            <ul>
-              <li>Nội dung câu hỏi:</li>
-              <li>A. Nội dung đáp án A</li>
-              <li>B. Nội dung đáp án B</li>
-              <li>C. Nội dung đáp án C</li>
-              <li>D. Nội dung đáp án D</li>
-            </ul>
+            <div class="d-flex align-items-center">
+              <mat-icon>info</mat-icon>
+              <strong class="mt-1">Định dạng file được hỗ trợ:</strong>
+            </div>
+            <div class="format-details">
+              <div class="format-type w-50">
+                <strong>Word (.docx):</strong>
+                <ul>
+                  <div>1. Nội dung câu hỏi</div>
+                  <li>A. Nội dung đáp án A</li>
+                  <li>B. Nội dung đáp án B</li>
+                  <li>C. Nội dung đáp án C</li>
+                  <li>D. Nội dung đáp án D</li>
+                </ul>
+              </div>
+              <div class="format-type w-50">
+                <strong>Excel (.xlsx):</strong>
+                <p>Tải file mẫu để xem định dạng đầy đủ</p>
+                <ul>
+                  <li>
+                    Cột bắt buộc: Nội dung câu hỏi, Đáp án A-D, Đáp án đúng
+                  </li>
+                  <li>Cột tùy chọn: Giải thích, Hình ảnh (URL)</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -189,10 +238,19 @@
     mat-flat-button
     color="primary"
     (click)="onSave()"
-    [disabled]="selectedTab === 0 ? !form.valid : previewQuestions.length === 0"
+    [disabled]="
+      selectedTab === 0
+        ? !form.valid
+        : previewQuestions.length === 0 || isProcessing
+    "
   >
+    <mat-icon *ngIf="isProcessing" class="spinning">autorenew</mat-icon>
     {{
-      selectedTab === 0 ? "Lưu" : "Lưu " + previewQuestions.length + " câu hỏi"
+      selectedTab === 0
+        ? "Lưu"
+        : "Lưu " +
+          (previewQuestions.length > 0 ? previewQuestions.length : "") +
+          " câu hỏi"
     }}
   </button>
 </mat-dialog-actions>

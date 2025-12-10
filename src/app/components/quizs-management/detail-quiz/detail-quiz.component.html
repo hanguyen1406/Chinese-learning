@@ -49,21 +49,25 @@
             background-color: rgb(237, 220, 188);
           "
         >
-          Thời gian còn lại: {{ displayTime }}
+          <span *ngIf="!isReviewMode">
+            Thời gian còn lại: {{ displayTime }}
+          </span>
+          <span *ngIf="isReviewMode">Điểm {{ score }}/10</span>
         </mat-card>
         <mat-card
-          color=""
+          (click)="isReviewMode ? reDoQuiz() : submitQuiz()"
           class="p-2 mr-1 text-center"
-          style="font-weight: bold; width: 80px; background-color: limegreen"
+          style="font-weight: bold; width: 80px; background-color: limegreen; cursor: pointer;"
         >
-          Nộp bài
+          <span *ngIf="!isReviewMode"> Nộp bài </span>
+          <span *ngIf="isReviewMode"> Làm lại </span>
         </mat-card>
         <mat-card
-          color="primary"
+          (click)="exit()"
           class="p-2 text-center"
-          style="font-weight: bold; width: 80px; background-color: orangered"
+          style="font-weight: bold; width: 80px; background-color: orangered; cursor: pointer;"
         >
-          Hủy
+          Thoát
         </mat-card>
       </div>
     </div>
@@ -93,62 +97,136 @@
           </mat-form-field>
 
           <!-- 4 Answers in 2x2 Grid with Radio -->
-          <mat-radio-group formControlName="answer">
-            <div class="answers-grid">
-              <div class="answer-row">
-                <mat-radio-button value="a" color="warn"></mat-radio-button>
-                <mat-form-field appearance="outline">
-                  <mat-label>Đáp án A</mat-label>
-                  <input
-                    [readonly]="role !== 'ROLE_ADMINISTRATOR'"
-                    matInput
-                    formControlName="a"
-                  />
-                </mat-form-field>
-              </div>
+          <div class="answers-grid">
+            <!-- A -->
+            <div class="answer-row">
+              <mat-checkbox
+                *ngIf="isReviewMode"
+                [checked]="correctAnswer === 'a' || userAnswer === 'a'"
+                [ngClass]="{
+                  correct: correctAnswer === 'a',
+                  wrong: userAnswer === 'a' && correctAnswer !== 'a'
+                }"
+                disabled
+              ></mat-checkbox>
 
-              <div class="answer-row">
-                <mat-radio-button value="b" color="warn"></mat-radio-button>
-                <mat-form-field appearance="outline">
-                  <mat-label>Đáp án B</mat-label>
-                  <input
-                    [readonly]="role !== 'ROLE_ADMINISTRATOR'"
-                    matInput
-                    formControlName="b"
-                  />
-                </mat-form-field>
-              </div>
+              <mat-radio-button
+                *ngIf="!isReviewMode"
+                value="a"
+                color="warn"
+                (change)="selectedQues.get('answer')?.setValue('a')"
+                [checked]="selectedQues.get('answer')?.value === 'a'"
+              ></mat-radio-button>
 
-              <div class="answer-row">
-                <mat-radio-button value="c" color="warn"></mat-radio-button>
-                <mat-form-field appearance="outline">
-                  <mat-label>Đáp án C</mat-label>
-                  <input
-                    [readonly]="role !== 'ROLE_ADMINISTRATOR'"
-                    matInput
-                    formControlName="c"
-                  />
-                </mat-form-field>
-              </div>
-
-              <div class="answer-row">
-                <mat-radio-button value="d" color="warn"></mat-radio-button>
-                <mat-form-field appearance="outline">
-                  <mat-label>Đáp án D</mat-label>
-                  <input
-                    [readonly]="role !== 'ROLE_ADMINISTRATOR'"
-                    matInput
-                    formControlName="d"
-                  />
-                </mat-form-field>
-              </div>
+              <mat-form-field appearance="outline">
+                <mat-label>Đáp án A</mat-label>
+                <input
+                  [readonly]="this.role == 'ROLE_USER'"
+                  matInput
+                  formControlName="a"
+                />
+              </mat-form-field>
             </div>
-          </mat-radio-group>
+
+            <!-- B -->
+            <div class="answer-row">
+              <mat-checkbox
+                *ngIf="isReviewMode"
+                [checked]="correctAnswer === 'b' || userAnswer === 'b'"
+                [ngClass]="{
+                  correct: correctAnswer === 'b',
+                  wrong: userAnswer === 'b' && correctAnswer !== 'b'
+                }"
+                disabled
+              ></mat-checkbox>
+
+              <mat-radio-button
+                *ngIf="!isReviewMode"
+                value="b"
+                color="warn"
+                (change)="selectedQues.get('answer')?.setValue('b')"
+                [checked]="selectedQues.get('answer')?.value === 'b'"
+              ></mat-radio-button>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Đáp án B</mat-label>
+                <input
+                  [readonly]="this.role == 'ROLE_USER'"
+                  matInput
+                  formControlName="b"
+                />
+              </mat-form-field>
+            </div>
+
+            <!-- C -->
+            <div class="answer-row">
+              <mat-checkbox
+                *ngIf="isReviewMode"
+                [checked]="correctAnswer === 'c' || userAnswer === 'c'"
+                [ngClass]="{
+                  correct: correctAnswer === 'c',
+                  wrong: userAnswer === 'c' && correctAnswer !== 'c'
+                }"
+                disabled
+              ></mat-checkbox>
+
+              <mat-radio-button
+                *ngIf="!isReviewMode"
+                value="c"
+                color="warn"
+                (change)="selectedQues.get('answer')?.setValue('c')"
+                [checked]="selectedQues.get('answer')?.value === 'c'"
+              ></mat-radio-button>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Đáp án C</mat-label>
+                <input
+                  [readonly]="this.role == 'ROLE_USER'"
+                  matInput
+                  formControlName="c"
+                />
+              </mat-form-field>
+            </div>
+
+            <!-- D -->
+            <div class="answer-row">
+              <mat-checkbox
+                *ngIf="isReviewMode"
+                [checked]="correctAnswer === 'd' || userAnswer === 'd'"
+                [ngClass]="{
+                  correct: correctAnswer === 'd',
+                  wrong: userAnswer === 'd' && correctAnswer !== 'd'
+                }"
+                disabled
+              ></mat-checkbox>
+
+              <mat-radio-button
+                *ngIf="!isReviewMode"
+                value="d"
+                color="warn"
+                (change)="selectedQues.get('answer')?.setValue('d')"
+                [checked]="selectedQues.get('answer')?.value === 'd'"
+              ></mat-radio-button>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Đáp án D</mat-label>
+                <input
+                  [readonly]="this.role == 'ROLE_USER'"
+                  matInput
+                  formControlName="d"
+                />
+              </mat-form-field>
+            </div>
+          </div>
 
           <!-- URL hình ảnh -->
           <div class="row">
             <div class="col-md-12">
-              <mat-form-field *ngIf="role === 'ROLE_ADMINISTRATOR'" appearance="outline" class="full-width">
+              <mat-form-field
+                *ngIf="role === 'ROLE_ADMINISTRATOR'"
+                appearance="outline"
+                class="full-width"
+              >
                 <mat-label>URL hình ảnh</mat-label>
                 <input
                   matInput
@@ -160,12 +238,17 @@
           </div>
 
           <!-- Explanation -->
-          <mat-form-field *ngIf="role === 'ROLE_ADMINISTRATOR'" appearance="outline" class="full-width">
+          <mat-form-field
+            *ngIf="isReviewMode"
+            appearance="outline"
+            class="full-width"
+          >
             <mat-label>Giải thích đáp án đúng</mat-label>
             <textarea
               matInput
               formControlName="explanation"
               rows="2"
+              [readonly]="isReviewMode"
             ></textarea>
           </mat-form-field>
 
