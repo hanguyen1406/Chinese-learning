@@ -41,7 +41,9 @@
       </div>
       <div *ngIf="role != 'ROLE_ADMINISTRATOR'">
         <br />
-        <h2><b> Khóa học miễn phí </b></h2>
+        <h2>
+          <b> Khóa học miễn phí: {{ course?.name }}</b>
+        </h2>
       </div>
     </header>
   </div>
@@ -115,7 +117,10 @@
       </button>
     </div>
 
-    <app-comment-lesson *ngIf="showComment" [lessonId]="this.selectedLesson?.id">
+    <app-comment-lesson
+      *ngIf="showComment"
+      [lessonId]="this.selectedLesson?.id"
+    >
     </app-comment-lesson>
   </mat-drawer>
 </mat-drawer-container>

@@ -57,6 +57,7 @@ export class DetailQuizComponent implements OnInit, OnDestroy {
     const user = this.tokenStorageService.getUser() ?? { roles: [] };
     if (user?.roles?.includes('ROLE_ADMINISTRATOR')) {
       this.role = 'ROLE_ADMINISTRATOR';
+      this.getAllQuestions();
     } else {
       this.role = 'ROLE_USER';
       let view = this.route.snapshot.queryParamMap.get('view'); // → 'result'
