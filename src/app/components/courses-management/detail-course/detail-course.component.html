@@ -30,7 +30,7 @@
       <div class="row" *ngIf="role == 'ROLE_ADMINISTRATOR'">
         <div class="col-md-10">
           <h2 style="margin: 0px">
-            <b>{{ course?.name }} </b>
+            <b>Khóa học: {{ course?.name }} </b>
           </h2>
         </div>
         <div class="col-md-2">
@@ -53,15 +53,21 @@
       <h3 *ngIf="!hasLessons" class="text-center">
         Khóa học này chưa có bài giảng nào
       </h3>
-      <div #video class="video-container" *ngIf="videoUrl">
-        <div class="video-wrapper">
+      <div #video class="video-container" *ngIf="videoId">
+        <div class="video-wrapper shadow-sm">
+          <!-- IFRAME YOUTUBE -->
           <iframe
-            [src]="videoUrl"
+            #ytIframe
+            width="100%"
+            height="400"
+            [src]="safeVideoUrl"
             frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow="autoplay; encrypted-media"
             allowfullscreen
-          ></iframe>
+          >
+          </iframe>
         </div>
+
         <div class="container mb-5" *ngIf="selectedLesson">
           <h2>
             <b>{{ indexCurrentLesson + 1 }}. {{ selectedLesson.nameLesson }}</b>
@@ -77,14 +83,34 @@
     <div class="col-md-3">
       <h3>Nội dung Khóa học</h3>
 
-      <div class="lesson-cards">
+      <div class="lesson-cards shadow-sm">
         <div
           *ngFor="let lesson of lessons; let i = index"
           (click)="selectLesson(lesson)"
-          class="lesson-card"
+          class="lesson-card text-truncate"
           [ngClass]="{ active: lesson === selectedLesson }"
+          [title]="lesson.nameLesson"
         >
-          <b>{{ i + 1 }}.</b> {{ lesson.nameLesson }}
+          <div class="d-flex">
+            <mat-icon style="min-width: 25px; font-size: 17px; color: #00c853"
+              >task_alt</mat-icon
+            >
+            <b>{{ i + 1 }}.&nbsp;</b> {{ lesson.nameLesson }}
+          </div>
+          <div class="d-flex">
+            <mat-icon
+              *ngIf="lesson !== selectedLesson"
+              style="font-size: 17px; color: #bb254a"
+              >access_time</mat-icon
+            >
+            <mat-icon
+              *ngIf="lesson === selectedLesson"
+              style="font-size: 20px; color: #bb254a"
+              >play_arrow</mat-icon
+            >
+
+            <span>{{ lesson.timeLesson }} phút</span>
+          </div>
         </div>
       </div>
     </div>

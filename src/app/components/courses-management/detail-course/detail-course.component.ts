@@ -11,6 +11,7 @@ import {
   NgxNotificationMsgService,
   NgxNotificationStatusMsg,
 } from 'ngx-notification-msg';
+
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
@@ -20,15 +21,30 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 })
 export class DetailCourseComponent implements OnInit {
   idCourse!: string;
-  role: string = '';
+  role = '';
   course: any;
+
   lessons: Lesson[] = [];
   selectedLesson?: Lesson;
-  videoUrl?: SafeResourceUrl;
-  hasLessons: boolean = false;
-  indexCurrentLesson: number = 0;
+
+  hasLessons = false;
+  indexCurrentLesson = 0;
+
+  videoId = '';
+  safeVideoUrl!: SafeResourceUrl;
+
+  currentTime = 0;
+  totalDuration = 0;
+  watchedSeconds = 0;
+  lastTick = 0;
+
+  intervalWatch: any;
+
   showComment = false;
+
   @ViewChild('video') videoContainer!: ElementRef;
+  @ViewChild('ytIframe') ytIframe!: ElementRef<HTMLIFrameElement>;
+
   constructor(
     private route: ActivatedRoute,
     private tokenStorageService: TokenStorageService,
@@ -41,60 +57,134 @@ export class DetailCourseComponent implements OnInit {
 
   ngOnInit(): void {
     this.idCourse = this.route.snapshot.paramMap.get('idCourse')!;
+
     const user = this.tokenStorageService.getUser() ?? { roles: [] };
-    if (user?.roles?.includes('ROLE_ADMINISTRATOR'))
+    if (user?.roles?.includes('ROLE_ADMINISTRATOR')) {
       this.role = 'ROLE_ADMINISTRATOR';
+    }
+
     this.getDetailCourse();
     this.getLessonsOfCourse();
   }
+
   getDetailCourse() {
     this.courseService.getCourseById(+this.idCourse).subscribe((course) => {
       this.course = course;
     });
   }
 
+  /** Chọn bài học */
   selectLesson(lesson: Lesson) {
     this.selectedLesson = lesson;
     this.indexCurrentLesson = this.lessons.indexOf(lesson);
-    this.videoUrl = this.getYoutubeEmbedUrl(lesson.linkVideo!);
+
+    this.videoId = this.extractVideoId(lesson.linkVideo!);
+
+    const origin = window.location.origin;
+
+    const url =
+      `https://www.youtube.com/embed/${this.videoId}` +
+      `?enablejsapi=1&controls=1&rel=0&modestbranding=1&playsinline=1&origin=${origin}&widgetid=1`;
+    console.log('log:', url);
+    
+    this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+    if (this.intervalWatch) clearInterval(this.intervalWatch);
+    this.watchedSeconds = 0;
+
+    setTimeout(() => this.initYouTubeListener(), 500);
+
     this.videoContainer.nativeElement.scrollTop = 0;
   }
+
+  /** Lấy danh sách bài học */
   getLessonsOfCourse() {
-    if (!this.idCourse) return;
     this.lessonService
       .getLessonsOfCourse(+this.idCourse)
-      .subscribe((lessons: any) => {
+      .subscribe((lessons: Lesson[]) => {
         this.lessons = lessons;
-        if (this.lessons.length > 0) {
+        if (lessons.length > 0) {
           this.hasLessons = true;
           this.selectLesson(this.lessons[0]);
         }
       });
   }
-  openCreate() {
-    const ref = this.dialog.open(AddLessonComponent, {
-      width: '640px',
-      disableClose: true,
+
+  /** Parse videoId */
+  extractVideoId(link: string): string {
+    const watch = link.match(/[?&]v=([^&]+)/);
+    if (watch) return watch[1];
+
+    const short = link.match(/youtu\.be\/([^?&]+)/);
+    if (short) return short[1];
+
+    return link;
+  }
+
+  /** Listener nhận thông tin từ YouTube iframe */
+  initYouTubeListener() {
+    window.addEventListener('message', (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        if (!data?.info) return;
+
+        if (data.info.currentTime !== undefined) {
+          this.currentTime = data.info.currentTime;
+        }
+
+        if (data.info.duration !== undefined) {
+          this.totalDuration = data.info.duration;
+        }
+      } catch {}
     });
 
-    ref.afterClosed().subscribe((data?: Lesson) => {
-      if (!data) return; // user bấm Hủy
-      data.courseId = +this.idCourse;
-      this.lessonService.createLesson(data).subscribe({
-        next: () => {
-          this.getLessonsOfCourse();
-        },
-        error: (err) => {
-          this.ngxNotificationMsgService.open({
-            status: NgxNotificationStatusMsg.FAILURE,
-            header: 'Lỗi',
-            messages: [err.error.message],
-            direction: NgxNotificationDirection.BOTTOM_RIGHT,
-          });
-        },
-      });
-    });
+    this.startWatchTimer();
   }
+
+  /** Gửi lệnh tới iframe */
+  sendCommand(func: string) {
+    this.ytIframe?.nativeElement.contentWindow?.postMessage(
+      JSON.stringify({
+        event: 'command',
+        func,
+        args: [],
+      }),
+      '*'
+    );
+  }
+
+  /** Theo dõi thời gian xem + gửi mỗi 5s */
+  startWatchTimer() {
+    this.intervalWatch = setInterval(() => {
+      // yêu cầu cập nhật currentTime
+      this.sendCommand('getCurrentTime');
+      this.sendCommand('getDuration');
+
+      this.watchedSeconds++;
+
+      if (this.watchedSeconds % 5 === 0) {
+        this.sendProgressToDB(false);
+      }
+    }, 1000);
+  }
+
+  sendProgressToDB(isCompleted: boolean) {
+    if (!this.selectedLesson) return;
+
+    const req = {
+      lessonId: this.selectedLesson.id,
+      watchedSeconds: Math.floor(this.watchedSeconds),
+      currentTime: Math.floor(this.currentTime),
+      totalDuration: Math.floor(this.totalDuration),
+      completed: isCompleted,
+    };
+
+    console.log('Progress gửi về backend:', req);
+
+    // this.lessonService.updateWatchProgress(req).subscribe();
+  }
+
   openComment() {
     this.showComment = true;
   }
@@ -102,34 +192,27 @@ export class DetailCourseComponent implements OnInit {
   closeComment() {
     this.showComment = false;
   }
-  private getYoutubeEmbedUrl(link: string): SafeResourceUrl | undefined {
-    if (!link) return undefined;
 
-    // xử lý vài kiểu link cơ bản:
-    // https://www.youtube.com/watch?v=XXXX
-    // https://youtu.be/XXXX
-    let videoId = '';
+  openCreate() {
+    const ref = this.dialog.open(AddLessonComponent, {
+      width: '640px',
+      disableClose: true,
+    });
 
-    // dạng watch?v=
-    const watchMatch = link.match(/[?&]v=([^&]+)/);
-    if (watchMatch && watchMatch[1]) {
-      videoId = watchMatch[1];
-    }
+    ref.afterClosed().subscribe((data?: Lesson) => {
+      if (!data) return;
+      data.courseId = +this.idCourse;
 
-    // dạng youtu.be/xxxx
-    if (!videoId) {
-      const shortMatch = link.match(/youtu\.be\/([^?&]+)/);
-      if (shortMatch && shortMatch[1]) {
-        videoId = shortMatch[1];
-      }
-    }
-
-    // nếu link đã là id sẵn
-    if (!videoId) {
-      videoId = link;
-    }
-
-    const embedUrl = `https://www.youtube.com/embed/${videoId}`;
-    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+      this.lessonService.createLesson(data).subscribe({
+        next: () => this.getLessonsOfCourse(),
+        error: (err) =>
+          this.ngxNotificationMsgService.open({
+            status: NgxNotificationStatusMsg.FAILURE,
+            header: 'Lỗi',
+            messages: [err.error.message],
+            direction: NgxNotificationDirection.BOTTOM_RIGHT,
+          }),
+      });
+    });
   }
 }

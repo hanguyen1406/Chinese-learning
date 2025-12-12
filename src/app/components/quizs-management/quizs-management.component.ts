@@ -70,6 +70,18 @@ export class QuizsManagementComponent implements OnInit {
     const el = document.getElementById('scroll-' + courseName);
     if (el) el.scrollLeft -= 300; // tốc độ cuộn
   }
+  updateRequired(quiz: any) {
+    const payload = { required: quiz.required };
+
+    // this.quizService.updateQuiz(quiz.id, payload).subscribe({
+    //   next: () => {
+    //     console.log('✔ Đã cập nhật trạng thái bắt buộc:', payload);
+    //   },
+    //   error: (err) => {
+    //     console.error('❌ Lỗi cập nhật quiz:', err);
+    //   },
+    // });
+  }
 
   scrollRight(courseName: string) {
     const el = document.getElementById('scroll-' + courseName);
@@ -97,7 +109,7 @@ export class QuizsManagementComponent implements OnInit {
   doQuiz(quizId: number) {
     this.router.navigate(['/quizs', quizId]);
   }
-  
+
   onDelete(quiz: Quiz) {
     if (confirm(`Bạn muốn xoá bài kiểm tra "${quiz.name}" ?`)) {
       // this.quizService.deleteQuiz(quiz.id).subscribe(() => {

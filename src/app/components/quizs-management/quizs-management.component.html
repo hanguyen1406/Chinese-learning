@@ -44,17 +44,31 @@
               <a (click)="doQuiz(q.id)">
                 <h4 class="quiz-title" [title]="q.name">{{ q.name }}</h4>
               </a>
+
               <div class="quiz-info">
                 <div style="padding-left: 3px">
-                  ⏱
-                  <span style="margin-left: 3px"> {{ q.timeQuiz }} phút </span>
+                  ⏱ <span style="margin-left: 3px">{{ q.timeQuiz }} phút</span>
                 </div>
-                <div>❓ {{ q.numOfQues }} câu</div> 
-                <div (click)="doQuiz(q.id)" class="test"> Bắt đầu làm </div>
+                <div>❓ {{ q.numOfQues }} câu</div>
+
+                <div (click)="doQuiz(q.id)" class="test">Bắt đầu làm</div>
+              </div>
+
+              <!-- ⭐ Checkbox bài test bắt buộc (chỉ admin thấy) -->
+              <div
+                *ngIf="role === 'ROLE_ADMINISTRATOR'"
+                class="required-checkbox"
+              >
+                <mat-checkbox
+                  [(ngModel)]="q.required"
+                  (change)="updateRequired(q)"
+                >
+                  Bài test bắt buộc
+                </mat-checkbox>
               </div>
             </div>
 
-            <!-- Nút sửa / xóa (Glass icon-btn) -->
+            <!-- Nút xóa -->
             <div *ngIf="role === 'ROLE_ADMINISTRATOR'" class="quiz-actions">
               <div class="icon-btn delete-btn" (click)="onDelete(q)">
                 <mat-icon>close</mat-icon>

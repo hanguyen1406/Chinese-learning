@@ -5,4 +5,5 @@ export interface Quiz {
   numOfQues: number;
   timeQuiz: number;
   courseId: number;
+  required?: boolean;
 }
