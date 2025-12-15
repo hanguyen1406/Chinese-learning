@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TokenStorageService } from '../../../service/token-storage/token-storage.service';
 import { CourseService } from '../../../service/course/course.service';
@@ -11,7 +11,6 @@ import {
   NgxNotificationMsgService,
   NgxNotificationStatusMsg,
 } from 'ngx-notification-msg';
-
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
@@ -19,7 +18,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   templateUrl: './detail-course.component.html',
   styleUrls: ['./detail-course.component.css'],
 })
-export class DetailCourseComponent implements OnInit {
+export class DetailCourseComponent implements OnInit, OnDestroy {
   idCourse!: string;
   role = '';
   course: any;
@@ -36,9 +35,12 @@ export class DetailCourseComponent implements OnInit {
   currentTime = 0;
   totalDuration = 0;
   watchedSeconds = 0;
-  lastTick = 0;
+  isPlaying = false;
 
   intervalWatch: any;
+  progressInterval: any;
+  YT: any;
+  player: any;
 
   showComment = false;
 
@@ -65,6 +67,25 @@ export class DetailCourseComponent implements OnInit {
 
     this.getDetailCourse();
     this.getLessonsOfCourse();
+    
+    // Load YouTube IFrame API
+    this.loadYouTubeAPI();
+  }
+
+  loadYouTubeAPI() {
+    if (!(window as any).YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode!.insertBefore(tag, firstScriptTag);
+      
+      (window as any).onYouTubeIframeAPIReady = () => {
+        this.YT = (window as any).YT;
+        console.log('YouTube API ready');
+      };
+    } else {
+      this.YT = (window as any).YT;
+    }
   }
 
   getDetailCourse() {
@@ -77,31 +98,141 @@ export class DetailCourseComponent implements OnInit {
   selectLesson(lesson: Lesson) {
     this.selectedLesson = lesson;
     this.indexCurrentLesson = this.lessons.indexOf(lesson);
-
     this.videoId = this.extractVideoId(lesson.linkVideo!);
-
     const origin = window.location.origin;
-
     const url =
       `https://www.youtube.com/embed/${this.videoId}` +
-      `?enablejsapi=1&controls=1&rel=0&modestbranding=1&playsinline=1&origin=${origin}&widgetid=1`;
-    console.log('log:', url);
-    
+      `?enablejsapi=1&controls=1&rel=0&modestbranding=1&playsinline=1&origin=${origin}&widgetid=1`; 
     this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-
-    if (this.intervalWatch) clearInterval(this.intervalWatch);
+    // Dừng interval cũ nếu có
+    this.stopAllIntervals();
     this.watchedSeconds = 0;
+    this.currentTime = 0;
 
-    setTimeout(() => this.initYouTubeListener(), 500);
+    // Khởi tạo player sau khi iframe được tạo
+    setTimeout(() => this.initializePlayer(), 1000);
 
     this.videoContainer.nativeElement.scrollTop = 0;
+  }
+
+  /** Khởi tạo YouTube Player */
+  initializePlayer() {
+    if (!this.YT) {
+      this.YT = (window as any).YT;
+      if (!this.YT) {
+        console.log('YouTube API chưa sẵn sàng');
+        setTimeout(() => this.initializePlayer(), 500);
+        return;
+      }
+    }
+
+    // Xóa player cũ nếu tồn tại
+    if (this.player && this.player.destroy) {
+      this.player.destroy();
+    }
+
+    // Tạo player mới
+    this.player = new this.YT.Player(this.ytIframe.nativeElement, {
+      events: {
+        'onReady': (event: any) => this.onPlayerReady(event),
+        'onStateChange': (event: any) => this.onPlayerStateChange(event),
+        'onError': (event: any) => this.onPlayerError(event)
+      }
+    });
+  }
+
+  /** Sự kiện khi player sẵn sàng */
+  onPlayerReady(event: any) {
+    console.log('YouTube Player is ready');
+    
+    // Lấy thông tin thời lượng video
+    this.totalDuration = event.target.getDuration();
+    
+    // Bắt đầu theo dõi thời gian
+    this.startTimeTracking();
+  }
+
+  /** Sự kiện khi trạng thái player thay đổi */
+  onPlayerStateChange(event: any) {
+    const state = event.data;
+    
+    if (state === this.YT.PlayerState.PLAYING) {
+      this.isPlaying = true;
+      console.log('Video đang phát');
+      this.startTimeTracking();
+    } else if (state === this.YT.PlayerState.PAUSED) {
+      this.isPlaying = false;
+      console.log('Video tạm dừng');
+    } else if (state === this.YT.PlayerState.ENDED) {
+      this.isPlaying = false;
+      console.log('Video kết thúc');
+      this.sendProgressToDB(true); // Đánh dấu hoàn thành
+    }
+  }
+
+  onPlayerError(event: any) {
+    console.error('YouTube Player Error:', event.data);
+  }
+
+  /** Bắt đầu theo dõi thời gian */
+  startTimeTracking() {
+    this.stopAllIntervals();
+    
+    // Cập nhật thời gian mỗi 100ms
+    this.intervalWatch = setInterval(() => {
+      if (this.player && this.player.getCurrentTime) {
+        try {
+          this.currentTime = this.player.getCurrentTime();
+          this.watchedSeconds++;
+          
+          // Gửi tiến độ mỗi 5 giây
+          if (this.watchedSeconds % 5 === 0) {
+            this.sendProgressToDB(false);
+          }
+        } catch (error) {
+          console.error('Lỗi khi lấy thời gian:', error);
+        }
+      }
+    }, 100);
+  }
+
+  /** Dừng tất cả interval */
+  stopAllIntervals() {
+    if (this.intervalWatch) {
+      clearInterval(this.intervalWatch);
+      this.intervalWatch = null;
+    }
+    if (this.progressInterval) {
+      clearInterval(this.progressInterval);
+      this.progressInterval = null;
+    }
+  }
+
+  /** Gửi tiến độ xem về backend */
+  sendProgressToDB(isCompleted: boolean) {
+    if (!this.selectedLesson || !this.player) return;
+
+    const req = {
+      lessonId: this.selectedLesson.id,
+      watchedSeconds: Math.floor(this.watchedSeconds),
+      currentTime: Math.floor(this.currentTime),
+      totalDuration: Math.floor(this.totalDuration),
+      completed: isCompleted,
+    };
+
+    console.log('Progress gửi về backend:', req);
+
+    // this.lessonService.updateWatchProgress(req).subscribe({
+    //   next: (response) => console.log('Progress saved:', response),
+    //   error: (err) => console.error('Error saving progress:', err)
+    // });
   }
 
   /** Lấy danh sách bài học */
   getLessonsOfCourse() {
     this.lessonService
       .getLessonsOfCourse(+this.idCourse)
-      .subscribe((lessons: Lesson[]) => {
+      .subscribe((lessons:any) => {
         this.lessons = lessons;
         if (lessons.length > 0) {
           this.hasLessons = true;
@@ -119,70 +250,6 @@ export class DetailCourseComponent implements OnInit {
     if (short) return short[1];
 
     return link;
-  }
-
-  /** Listener nhận thông tin từ YouTube iframe */
-  initYouTubeListener() {
-    window.addEventListener('message', (event) => {
-      try {
-        const data = JSON.parse(event.data);
-
-        if (!data?.info) return;
-
-        if (data.info.currentTime !== undefined) {
-          this.currentTime = data.info.currentTime;
-        }
-
-        if (data.info.duration !== undefined) {
-          this.totalDuration = data.info.duration;
-        }
-      } catch {}
-    });
-
-    this.startWatchTimer();
-  }
-
-  /** Gửi lệnh tới iframe */
-  sendCommand(func: string) {
-    this.ytIframe?.nativeElement.contentWindow?.postMessage(
-      JSON.stringify({
-        event: 'command',
-        func,
-        args: [],
-      }),
-      '*'
-    );
-  }
-
-  /** Theo dõi thời gian xem + gửi mỗi 5s */
-  startWatchTimer() {
-    this.intervalWatch = setInterval(() => {
-      // yêu cầu cập nhật currentTime
-      this.sendCommand('getCurrentTime');
-      this.sendCommand('getDuration');
-
-      this.watchedSeconds++;
-
-      if (this.watchedSeconds % 5 === 0) {
-        this.sendProgressToDB(false);
-      }
-    }, 1000);
-  }
-
-  sendProgressToDB(isCompleted: boolean) {
-    if (!this.selectedLesson) return;
-
-    const req = {
-      lessonId: this.selectedLesson.id,
-      watchedSeconds: Math.floor(this.watchedSeconds),
-      currentTime: Math.floor(this.currentTime),
-      totalDuration: Math.floor(this.totalDuration),
-      completed: isCompleted,
-    };
-
-    console.log('Progress gửi về backend:', req);
-
-    // this.lessonService.updateWatchProgress(req).subscribe();
   }
 
   openComment() {
@@ -214,5 +281,36 @@ export class DetailCourseComponent implements OnInit {
           }),
       });
     });
+  }
+
+  /** Hàm tiện ích để kiểm tra và lấy thời gian */
+  getCurrentTime(): number {
+    if (this.player && this.player.getCurrentTime) {
+      return Math.floor(this.player.getCurrentTime());
+    }
+    return 0;
+  }
+
+  /** Hàm tiện ích để phát video */
+  playVideo() {
+    if (this.player && this.player.playVideo) {
+      this.player.playVideo();
+    }
+  }
+
+  /** Hàm tiện ích để tạm dừng video */
+  pauseVideo() {
+    if (this.player && this.player.pauseVideo) {
+      this.player.pauseVideo();
+    }
+  }
+
+  ngOnDestroy() {
+    this.stopAllIntervals();
+    
+    // Hủy player khi component bị destroy
+    if (this.player && this.player.destroy) {
+      this.player.destroy();
+    }
   }
 }

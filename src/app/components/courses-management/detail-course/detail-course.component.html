@@ -53,19 +53,40 @@
       <h3 *ngIf="!hasLessons" class="text-center">
         Khóa học này chưa có bài giảng nào
       </h3>
+      <!-- ... phần HTML trước giữ nguyên ... -->
+
+      <!-- ... phần HTML trước giữ nguyên ... -->
+
       <div #video class="video-container" *ngIf="videoId">
         <div class="video-wrapper shadow-sm">
-          <!-- IFRAME YOUTUBE -->
+          <!-- Thêm id cho iframe để YouTube API có thể nhận diện -->
           <iframe
             #ytIframe
+            id="youtube-player"
             width="100%"
             height="400"
             [src]="safeVideoUrl"
             frameborder="0"
-            allow="autoplay; encrypted-media"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
           >
           </iframe>
+        </div>
+
+        <!-- Hiển thị thời gian hiện tại -->
+        <div class="current-time-display" *ngIf="selectedLesson">
+          <p>
+            Thời gian hiện tại: {{ currentTime | number : "1.0-0" }} giây /
+            {{ totalDuration | number : "1.0-0" }} giây
+          </p>
+          <div class="progress-bar-container">
+            <mat-progress-bar
+              *ngIf="totalDuration > 0"
+              mode="determinate"
+              [value]="(currentTime / totalDuration) * 100"
+            >
+            </mat-progress-bar>
+          </div>
         </div>
 
         <div class="container mb-5" *ngIf="selectedLesson">
@@ -77,6 +98,10 @@
           </p>
         </div>
       </div>
+
+      <!-- ... phần HTML sau giữ nguyên ... -->
+
+      <!-- ... phần HTML sau giữ nguyên ... -->
     </div>
 
     <!-- Vùng danh sách bài học bên phải -->
