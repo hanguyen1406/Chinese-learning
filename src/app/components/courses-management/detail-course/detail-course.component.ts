@@ -1,4 +1,10 @@
-import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TokenStorageService } from '../../../service/token-storage/token-storage.service';
 import { CourseService } from '../../../service/course/course.service';
@@ -67,7 +73,7 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
 
     this.getDetailCourse();
     this.getLessonsOfCourse();
-    
+
     // Load YouTube IFrame API
     this.loadYouTubeAPI();
   }
@@ -78,7 +84,7 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
       tag.src = 'https://www.youtube.com/iframe_api';
       const firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode!.insertBefore(tag, firstScriptTag);
-      
+
       (window as any).onYouTubeIframeAPIReady = () => {
         this.YT = (window as any).YT;
         console.log('YouTube API ready');
@@ -96,23 +102,44 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
 
   /** Chọn bài học */
   selectLesson(lesson: Lesson) {
+    // Dừng interval trước
+    this.stopAllIntervals();
+
     this.selectedLesson = lesson;
     this.indexCurrentLesson = this.lessons.indexOf(lesson);
-    this.videoId = this.extractVideoId(lesson.linkVideo!);
-    const origin = window.location.origin;
-    const url =
-      `https://www.youtube.com/embed/${this.videoId}` +
-      `?enablejsapi=1&controls=1&rel=0&modestbranding=1&playsinline=1&origin=${origin}&widgetid=1`; 
-    this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-    // Dừng interval cũ nếu có
-    this.stopAllIntervals();
+
+    const newVideoId = this.extractVideoId(lesson.linkVideo!);
+
+    // Reset các giá trị tracking
     this.watchedSeconds = 0;
     this.currentTime = 0;
+    this.totalDuration = 0;
 
-    // Khởi tạo player sau khi iframe được tạo
-    setTimeout(() => this.initializePlayer(), 1000);
+    // Nếu player đã tồn tại và video đã được load trước đó, dùng loadVideoById
+    if (this.player && this.player.loadVideoById && this.videoId) {
+      this.videoId = newVideoId;
+      this.player.loadVideoById(newVideoId);
+    } else {
+      // Lần đầu tiên hoặc player chưa sẵn sàng
+      const origin = window.location.origin;
+      const url =
+        `https://www.youtube.com/embed/${newVideoId}` +
+        `?enablejsapi=1&controls=1&rel=0&modestbranding=1&playsinline=1&origin=${origin}&widgetid=1`;
 
-    this.videoContainer.nativeElement.scrollTop = 0;
+      this.videoId = newVideoId;
+      this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+      // Chờ Angular render xong iframe mới rồi mới khởi tạo player
+      setTimeout(() => {
+        if (this.ytIframe && this.ytIframe.nativeElement) {
+          this.initializePlayer();
+        }
+      }, 500);
+    }
+
+    if (this.videoContainer && this.videoContainer.nativeElement) {
+      this.videoContainer.nativeElement.scrollTop = 0;
+    }
   }
 
   /** Khởi tạo YouTube Player */
@@ -126,47 +153,66 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
       }
     }
 
-    // Xóa player cũ nếu tồn tại
-    if (this.player && this.player.destroy) {
-      this.player.destroy();
+    // Kiểm tra iframe có tồn tại không
+    if (!this.ytIframe || !this.ytIframe.nativeElement) {
+      console.log('Iframe chưa sẵn sàng');
+      setTimeout(() => this.initializePlayer(), 300);
+      return;
     }
 
     // Tạo player mới
-    this.player = new this.YT.Player(this.ytIframe.nativeElement, {
-      events: {
-        'onReady': (event: any) => this.onPlayerReady(event),
-        'onStateChange': (event: any) => this.onPlayerStateChange(event),
-        'onError': (event: any) => this.onPlayerError(event)
-      }
-    });
+    try {
+      this.player = new this.YT.Player(this.ytIframe.nativeElement, {
+        events: {
+          onReady: (event: any) => this.onPlayerReady(event),
+          onStateChange: (event: any) => this.onPlayerStateChange(event),
+          onError: (event: any) => this.onPlayerError(event),
+        },
+      });
+    } catch (error) {
+      console.error('Lỗi khởi tạo player:', error);
+    }
   }
 
   /** Sự kiện khi player sẵn sàng */
   onPlayerReady(event: any) {
     console.log('YouTube Player is ready');
-    
+
     // Lấy thông tin thời lượng video
-    this.totalDuration = event.target.getDuration();
-    
-    // Bắt đầu theo dõi thời gian
-    this.startTimeTracking();
+    if (event.target && event.target.getDuration) {
+      this.totalDuration = event.target.getDuration();
+    }
   }
 
   /** Sự kiện khi trạng thái player thay đổi */
   onPlayerStateChange(event: any) {
     const state = event.data;
-    
+
     if (state === this.YT.PlayerState.PLAYING) {
       this.isPlaying = true;
       console.log('Video đang phát');
+
+      // Cập nhật lại totalDuration khi video mới bắt đầu phát
+      if (this.player && this.player.getDuration) {
+        this.totalDuration = this.player.getDuration();
+      }
+
       this.startTimeTracking();
     } else if (state === this.YT.PlayerState.PAUSED) {
       this.isPlaying = false;
       console.log('Video tạm dừng');
+      this.stopAllIntervals();
     } else if (state === this.YT.PlayerState.ENDED) {
       this.isPlaying = false;
       console.log('Video kết thúc');
+      this.stopAllIntervals();
       this.sendProgressToDB(true); // Đánh dấu hoàn thành
+    } else if (state === this.YT.PlayerState.CUED) {
+      // Video đã được load xong (khi dùng loadVideoById)
+      console.log('Video đã sẵn sàng');
+      if (this.player && this.player.getDuration) {
+        this.totalDuration = this.player.getDuration();
+      }
     }
   }
 
@@ -177,14 +223,14 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
   /** Bắt đầu theo dõi thời gian */
   startTimeTracking() {
     this.stopAllIntervals();
-    
+
     // Cập nhật thời gian mỗi 100ms
     this.intervalWatch = setInterval(() => {
       if (this.player && this.player.getCurrentTime) {
         try {
           this.currentTime = this.player.getCurrentTime();
           this.watchedSeconds++;
-          
+
           // Gửi tiến độ mỗi 5 giây
           if (this.watchedSeconds % 5 === 0) {
             this.sendProgressToDB(false);
@@ -232,7 +278,7 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
   getLessonsOfCourse() {
     this.lessonService
       .getLessonsOfCourse(+this.idCourse)
-      .subscribe((lessons:any) => {
+      .subscribe((lessons: any) => {
         this.lessons = lessons;
         if (lessons.length > 0) {
           this.hasLessons = true;
@@ -307,7 +353,7 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.stopAllIntervals();
-    
+
     // Hủy player khi component bị destroy
     if (this.player && this.player.destroy) {
       this.player.destroy();
