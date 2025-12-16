@@ -37,12 +37,19 @@
             <img class="course-img" [src]="getImageUrl(c.thumbnailUrl)" />
 
             <div class="card-body p-2">
-              <h4 class="card-title mb-1 text-truncate" [title]="c.name">
+              <h4 class="card-title m-0 text-truncate" [title]="c.name">
                 <b>
                   {{ c.name }}
                 </b>
               </h4>
-              <div class="text-danger font-weight-bold">Miễn phí</div>
+              <div
+                class="text-danger font-weight-bold d-flex justify-content-between"
+              >
+                <span>Miễn phí</span>
+                <span class="edit-icon">
+                  <mat-icon style="font-size: 18px; height: 18px; width: 18px;">edit</mat-icon>
+                </span>
+              </div>
             </div>
 
             <div style="color: black" class="border-0">
