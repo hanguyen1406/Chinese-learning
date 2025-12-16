@@ -6,4 +6,5 @@ export interface Course {
   numRating?: number | null;
   quizId?: number | null;
   thumbnailUrl?: string | null;
+  prereqCourseId?: number | null;
 }

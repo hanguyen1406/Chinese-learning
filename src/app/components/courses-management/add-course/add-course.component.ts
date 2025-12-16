@@ -41,7 +41,7 @@ export class AddCourseComponent implements OnInit {
       },
       error: (err) => {
         console.error('Lỗi khi load danh sách khóa học:', err);
-      }
+      },
     });
   }
 

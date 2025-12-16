@@ -38,10 +38,21 @@
           id="numLesson"
           type="number"
           min="1"
-          class="form-control"
+          class="form-control mt-1"
           formControlName="numLesson"
           placeholder="1"
         />
+      </div>
+      <div class="form-group col-md-6">
+        <label for="prereqCourseId">Khóa cần hoàn thành</label>
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-select id="prereqCourseId" formControlName="prereqCourseId">
+            <mat-option [value]="null">-- Không yêu cầu --</mat-option>
+            <mat-option *ngFor="let course of courses" [value]="course.id">
+              {{ course.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
     </div>
 
@@ -55,21 +66,6 @@
         placeholder="https://..."
       />
       <small class="form-text text-muted">Dán URL ảnh bìa (tùy chọn)</small>
-    </div>
-
-    <div class="form-group">
-      <label for="prereqCourseId">Khóa cần hoàn thành</label>
-      <select
-        id="prereqCourseId"
-        class="form-control"
-        formControlName="prereqCourseId"
-      >
-        <option [ngValue]="null">-- Không yêu cầu --</option>
-        <option *ngFor="let course of courses" [ngValue]="course.id">
-          {{ course.name }}
-        </option>
-      </select>
-      <small class="form-text text-muted">Chọn khóa học cần hoàn thành trước (tùy chọn)</small>
     </div>
   </form>
 </div>
