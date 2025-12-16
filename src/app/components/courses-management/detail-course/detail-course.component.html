@@ -72,23 +72,6 @@
           >
           </iframe>
         </div>
-
-        <!-- Hiển thị thời gian hiện tại -->
-        <div class="current-time-display" *ngIf="selectedLesson">
-          <p>
-            Thời gian hiện tại: {{ currentTime | number : "1.0-0" }} giây /
-            {{ totalDuration | number : "1.0-0" }} giây
-          </p>
-          <div class="progress-bar-container">
-            <mat-progress-bar
-              *ngIf="totalDuration > 0"
-              mode="determinate"
-              [value]="(currentTime / totalDuration) * 100"
-            >
-            </mat-progress-bar>
-          </div>
-        </div>
-
         <div class="container mb-5" *ngIf="selectedLesson">
           <h2>
             <b>{{ indexCurrentLesson + 1 }}. {{ selectedLesson.nameLesson }}</b>
@@ -98,10 +81,6 @@
           </p>
         </div>
       </div>
-
-      <!-- ... phần HTML sau giữ nguyên ... -->
-
-      <!-- ... phần HTML sau giữ nguyên ... -->
     </div>
 
     <!-- Vùng danh sách bài học bên phải -->
@@ -117,10 +96,20 @@
           [title]="lesson.nameLesson"
         >
           <div class="d-flex">
-            <mat-icon style="min-width: 25px; font-size: 17px; color: #00c853"
+            <mat-icon
+              *ngIf="lesson.watched"
+              style="min-width: 25px; font-size: 17px; color: #00c853"
               >task_alt</mat-icon
             >
-            <b>{{ i + 1 }}.&nbsp;</b> {{ lesson.nameLesson }}
+            <mat-icon
+              style="min-width: 25px; font-size: 17px; color: #939393"
+              *ngIf="!lesson.watched"
+              fontSet="material-icons-outlined"
+            >
+              circle
+            </mat-icon>
+
+            <b>{{ i + 1 }}.&nbsp; {{ lesson.nameLesson }}</b>
           </div>
           <div class="d-flex">
             <mat-icon
@@ -134,7 +123,7 @@
               >play_arrow</mat-icon
             >
 
-            <span>{{ lesson.timeLesson }} phút</span>
+            <span>{{ formatSeconds(lesson.timeLesson) }}</span>
           </div>
         </div>
       </div>

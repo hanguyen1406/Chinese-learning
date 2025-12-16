@@ -17,6 +17,17 @@ export class LoadingInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
+    // Kiểm tra nếu request có header skip-loading thì không hiện loading
+    const skipLoading = req.headers.has('X-Skip-Loading');
+
+    if (skipLoading) {
+      // Xóa header trước khi gửi đi (backend không cần header này)
+      const newReq = req.clone({
+        headers: req.headers.delete('X-Skip-Loading'),
+      });
+      return next.handle(newReq);
+    }
+
     // Debug thử
     console.log('[LoadingInterceptor] start:', req.url);
     this.loadingService.show();

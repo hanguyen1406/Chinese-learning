@@ -29,14 +29,19 @@
       </mat-error>
     </mat-form-field>
 
-    <!-- Position -->
-    <mat-form-field appearance="fill" class="w-100">
-      <mat-label>Vị trí bài giảng</mat-label>
-      <input matInput type="number" formControlName="position" />
-      <mat-error *ngIf="lessonForm.get('position')?.hasError('required')">
-        Vị trí là bắt buộc
-      </mat-error>
-    </mat-form-field>
+    <!-- Thời lượng video (tự động lấy) -->
+    <div
+      class="duration-info"
+      *ngIf="lessonForm.get('timeLesson')?.value || isLoadingDuration"
+    >
+      <mat-icon *ngIf="!isLoadingDuration">schedule</mat-icon>
+      <mat-spinner *ngIf="isLoadingDuration" diameter="18"></mat-spinner>
+      <span *ngIf="!isLoadingDuration">
+        Thời lượng video:
+        {{ formatSeconds(lessonForm.get("timeLesson")?.value) }}
+      </span>
+      <span *ngIf="isLoadingDuration">Đang lấy thời lượng...</span>
+    </div>
   </form>
 </div>
 

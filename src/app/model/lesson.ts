@@ -5,4 +5,6 @@ export interface Lesson {
   linkVideo?: string;
   courseId?: number;
   position?: number;
+  timeLesson?: number;
+  watched?: boolean;
 }

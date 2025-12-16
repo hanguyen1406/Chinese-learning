@@ -1,0 +1,17 @@
+.duration-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  background-color: #e3f2fd;
+  border-radius: 4px;
+  color: #1565c0;
+  font-size: 14px;
+}
+
+.duration-info mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}

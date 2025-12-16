@@ -18,6 +18,7 @@ import {
   NgxNotificationStatusMsg,
 } from 'ngx-notification-msg';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { LessonProgress } from '../../../model/lessonProgress';
 
 @Component({
   selector: 'app-detail-course',
@@ -49,6 +50,11 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
   player: any;
 
   showComment = false;
+
+  // Progress tracking
+  savedProgress?: LessonProgress;
+  shouldSeekToSavedTime = false;
+  progressMap: Map<number, LessonProgress> = new Map();
 
   @ViewChild('video') videoContainer!: ElementRef;
   @ViewChild('ytIframe') ytIframe!: ElementRef<HTMLIFrameElement>;
@@ -105,6 +111,15 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
     // Dừng interval trước
     this.stopAllIntervals();
 
+    // Pause video hiện tại nếu đang phát
+    if (this.player && this.player.pauseVideo) {
+      try {
+        this.player.pauseVideo();
+      } catch (e) {
+        console.log('Pause error:', e);
+      }
+    }
+
     this.selectedLesson = lesson;
     this.indexCurrentLesson = this.lessons.indexOf(lesson);
 
@@ -115,10 +130,20 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
     this.currentTime = 0;
     this.totalDuration = 0;
 
-    // Nếu player đã tồn tại và video đã được load trước đó, dùng loadVideoById
-    if (this.player && this.player.loadVideoById && this.videoId) {
+    // Kiểm tra xem có progress đã lưu không
+    this.savedProgress = this.progressMap.get(lesson.id!);
+    console.log('Progress cho lesson', lesson.id, ':', this.savedProgress);
+    if (this.savedProgress && this.savedProgress.watchedTime > 0) {
+      this.shouldSeekToSavedTime = true;
+      console.log('Sẽ seek đến:', this.savedProgress.watchedTime, 'giây');
+    } else {
+      this.shouldSeekToSavedTime = false;
+    }
+
+    // Nếu player đã tồn tại và video đã được load trước đó, dùng cueVideoById (không tự động phát)
+    if (this.player && this.player.cueVideoById && this.videoId) {
       this.videoId = newVideoId;
-      this.player.loadVideoById(newVideoId);
+      this.player.cueVideoById(newVideoId); // Dùng cueVideoById thay vì loadVideoById
     } else {
       // Lần đầu tiên hoặc player chưa sẵn sàng
       const origin = window.location.origin;
@@ -177,7 +202,6 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
   /** Sự kiện khi player sẵn sàng */
   onPlayerReady(event: any) {
     console.log('YouTube Player is ready');
-
     // Lấy thông tin thời lượng video
     if (event.target && event.target.getDuration) {
       this.totalDuration = event.target.getDuration();
@@ -190,26 +214,44 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
 
     if (state === this.YT.PlayerState.PLAYING) {
       this.isPlaying = true;
-      console.log('Video đang phát');
+      // console.log('Video đang phát');
+      // tạm dừng video
 
       // Cập nhật lại totalDuration khi video mới bắt đầu phát
       if (this.player && this.player.getDuration) {
         this.totalDuration = this.player.getDuration();
       }
 
+      // Seek đến thời gian đã lưu (chỉ thực hiện 1 lần khi video mới bắt đầu)
+      if (
+        this.shouldSeekToSavedTime &&
+        this.savedProgress &&
+        this.player &&
+        this.player.seekTo
+      ) {
+        const seekTime = this.savedProgress.watchedTime;
+        // console.log('Đang seek đến:', seekTime, 'giây');
+        this.player.seekTo(seekTime, true);
+        this.currentTime = seekTime;
+        this.shouldSeekToSavedTime = false; // Chỉ seek 1 lần
+      }
+
       this.startTimeTracking();
     } else if (state === this.YT.PlayerState.PAUSED) {
       this.isPlaying = false;
-      console.log('Video tạm dừng');
+      // console.log('Video tạm dừng');
       this.stopAllIntervals();
+
+      // Lưu progress khi tạm dừng
+      this.sendProgressToDB();
     } else if (state === this.YT.PlayerState.ENDED) {
       this.isPlaying = false;
-      console.log('Video kết thúc');
+      // console.log('Video kết thúc');
       this.stopAllIntervals();
-      this.sendProgressToDB(true); // Đánh dấu hoàn thành
+      this.sendProgressToDB(); // Đánh dấu hoàn thành
     } else if (state === this.YT.PlayerState.CUED) {
       // Video đã được load xong (khi dùng loadVideoById)
-      console.log('Video đã sẵn sàng');
+      // console.log('Video đã sẵn sàng');
       if (this.player && this.player.getDuration) {
         this.totalDuration = this.player.getDuration();
       }
@@ -219,27 +261,40 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
   onPlayerError(event: any) {
     console.error('YouTube Player Error:', event.data);
   }
+  formatSeconds(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
 
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs
+        .toString()
+        .padStart(2, '0')}`;
+    }
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  }
   /** Bắt đầu theo dõi thời gian */
   startTimeTracking() {
     this.stopAllIntervals();
 
-    // Cập nhật thời gian mỗi 100ms
+    // Cập nhật thời gian hiển thị mỗi 1 giây
     this.intervalWatch = setInterval(() => {
       if (this.player && this.player.getCurrentTime) {
         try {
           this.currentTime = this.player.getCurrentTime();
           this.watchedSeconds++;
-
-          // Gửi tiến độ mỗi 5 giây
-          if (this.watchedSeconds % 5 === 0) {
-            this.sendProgressToDB(false);
-          }
         } catch (error) {
           console.error('Lỗi khi lấy thời gian:', error);
         }
       }
-    }, 100);
+    }, 1000);
+
+    // Gửi tiến độ lên server mỗi 10 giây
+    this.progressInterval = setInterval(() => {
+      if (this.isPlaying) {
+        this.sendProgressToDB();
+      }
+    }, 10000);
   }
 
   /** Dừng tất cả interval */
@@ -255,23 +310,25 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
   }
 
   /** Gửi tiến độ xem về backend */
-  sendProgressToDB(isCompleted: boolean) {
+  sendProgressToDB() {
     if (!this.selectedLesson || !this.player) return;
 
-    const req = {
-      lessonId: this.selectedLesson.id,
-      watchedSeconds: Math.floor(this.watchedSeconds),
-      currentTime: Math.floor(this.currentTime),
-      totalDuration: Math.floor(this.totalDuration),
-      completed: isCompleted,
+    const progress: LessonProgress = {
+      lessonId: this.selectedLesson.id!,
+      watchedTime: Math.floor(this.currentTime),
+      courseId: +this.idCourse,
     };
 
-    console.log('Progress gửi về backend:', req);
+    // console.log('Progress gửi về backend:', progress);
 
-    // this.lessonService.updateWatchProgress(req).subscribe({
-    //   next: (response) => console.log('Progress saved:', response),
-    //   error: (err) => console.error('Error saving progress:', err)
-    // });
+    this.lessonService.saveProgress(progress).subscribe({
+      next: (response) => {
+        // console.log('Progress saved:', response);
+        // Cập nhật progressMap
+        this.progressMap.set(progress.lessonId, response);
+      },
+      error: (err) => console.error('Error saving progress:', err),
+    });
   }
 
   /** Lấy danh sách bài học */
@@ -282,9 +339,47 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
         this.lessons = lessons;
         if (lessons.length > 0) {
           this.hasLessons = true;
-          this.selectLesson(this.lessons[0]);
+
+          // Load progress trước, sau đó mới select lesson
+          this.loadAllProgress((lastViewedLessonId?: number) => {
+            // Nếu có lesson đã xem gần nhất, select lesson đó
+            if (lastViewedLessonId) {
+              const lastLesson = this.lessons.find(
+                (l) => l.id === lastViewedLessonId
+              );
+              if (lastLesson) {
+                this.selectLesson(lastLesson);
+                return;
+              }
+            }
+            // Nếu không có progress hoặc không tìm thấy lesson, select lesson đầu tiên
+            this.selectLesson(this.lessons[0]);
+          });
         }
       });
+  }
+
+  /** Load tất cả progress của user cho khóa học này */
+  loadAllProgress(callback?: (lastViewedLessonId?: number) => void) {
+    this.lessonService.getProgressByCourse(+this.idCourse).subscribe({
+      next: (progressList) => {
+        this.progressMap.clear();
+        progressList.forEach((p) => {
+          this.progressMap.set(p.lessonId, p);
+        });
+        console.log('Loaded progress:', this.progressMap);
+
+        // Progress đã được sắp xếp giảm dần theo lastAccessedAt
+        // Phần tử đầu tiên là lesson mới nhất user vừa xem
+        const lastViewedLessonId =
+          progressList.length > 0 ? progressList[0].lessonId : undefined;
+        if (callback) callback(lastViewedLessonId);
+      },
+      error: (err) => {
+        console.log('Chưa có progress hoặc lỗi:', err);
+        if (callback) callback();
+      },
+    });
   }
 
   /** Parse videoId */
