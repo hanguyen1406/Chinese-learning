@@ -29,7 +29,7 @@
 
       <div class="row" *ngIf="role == 'ROLE_ADMINISTRATOR'">
         <div class="col-md-10">
-          <h2 style="margin: 0px">
+          <h2 class="text-truncate m-0">
             <b>Khóa học: {{ course?.name }} </b>
           </h2>
         </div>
@@ -41,7 +41,7 @@
       </div>
       <div *ngIf="role != 'ROLE_ADMINISTRATOR'">
         <br />
-        <h2>
+        <h2 class="text-truncate m-0">
           <b> Khóa học miễn phí: {{ course?.name }}</b>
         </h2>
       </div>
@@ -87,9 +87,10 @@
     <div class="col-md-3">
       <h3>Nội dung Khóa học</h3>
 
-      <div class="lesson-cards shadow-sm">
+      <div #lessonList class="lesson-cards shadow-sm">
         <div
           *ngFor="let lesson of lessons; let i = index"
+          [id]="'lesson-' + lesson.id"
           (click)="selectLesson(lesson)"
           class="lesson-card text-truncate"
           [ngClass]="{ active: lesson === selectedLesson }"

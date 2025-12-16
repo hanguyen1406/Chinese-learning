@@ -58,6 +58,7 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
 
   @ViewChild('video') videoContainer!: ElementRef;
   @ViewChild('ytIframe') ytIframe!: ElementRef<HTMLIFrameElement>;
+  @ViewChild('lessonList') lessonList!: ElementRef;
 
   constructor(
     private route: ActivatedRoute,
@@ -163,8 +164,26 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
     }
 
     if (this.videoContainer && this.videoContainer.nativeElement) {
+      // Cuộn video container lên đầu
       this.videoContainer.nativeElement.scrollTop = 0;
     }
+
+    // Cuộn đến lesson đang được chọn trong danh sách (chỉ cuộn trong container lesson)
+    setTimeout(() => {
+      const lessonElement = document.getElementById('lesson-' + lesson.id);
+      if (lessonElement && this.lessonList && this.lessonList.nativeElement) {
+        const container = this.lessonList.nativeElement;
+        const lessonTop = lessonElement.offsetTop - container.offsetTop;
+        const containerHeight = container.clientHeight;
+        const lessonHeight = lessonElement.clientHeight;
+
+        // Cuộn để lesson nằm ở giữa container
+        container.scrollTo({
+          top: lessonTop - containerHeight / 2 + lessonHeight / 2,
+          behavior: 'smooth',
+        });
+      }
+    }, 100);
   }
 
   /** Khởi tạo YouTube Player */

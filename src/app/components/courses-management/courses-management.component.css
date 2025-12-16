@@ -1,7 +1,7 @@
 table {
   width: 100%;
 }
-    
+
 .mat-cell {
   padding: 12px 12px 12px 0;
 }
@@ -10,7 +10,7 @@ table {
   height: auto;
 }
 
-.mat-header-cell{
+.mat-header-cell {
   width: 5px;
 }
 
@@ -56,16 +56,22 @@ table {
 .cross {
   margin-left: 8px;
   font-size: 25px;
-  color:#000;
+  color: #000;
   cursor: pointer;
 }
 
-::ng-deep .mat-form-field-flex > .mat-form-field-infix { padding: 0.59em 0px !important; }
-::ng-deep .mat-form-field-label-wrapper { top: -1.2em; }
+::ng-deep .mat-form-field-flex > .mat-form-field-infix {
+  padding: 0.59em 0px !important;
+}
+::ng-deep .mat-form-field-label-wrapper {
+  top: -1.2em;
+}
 
-::ng-deep .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
-    transform: translateY(-1.1em) scale(.75);
-    width: 133.33333%;
+::ng-deep
+  .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float
+  .mat-form-field-label {
+  transform: translateY(-1.1em) scale(0.75);
+  width: 133.33333%;
 }
 
 .make-gold {
@@ -79,7 +85,7 @@ table {
 .row {
   width: 100%;
   margin: 0 auto;
-} 
+}
 
 .wrapper {
   margin-top: 15px;
@@ -88,18 +94,17 @@ table {
 }
 
 .wrapper > div {
-    margin: 0 16px;
+  margin: 0 16px;
 }
 
 body {
   margin: 0 auto;
-  
 }
 
 .cross {
   margin-left: 7px;
   font-size: 20px;
-  color:#000;
+  color: #000;
   cursor: pointer;
 }
 
@@ -156,9 +161,15 @@ body {
   transition: 0.25s ease;
   overflow: hidden; /* tránh ảnh lộ góc */
 }
-
+.course-img {
+  width: 100%;
+  height: 190px;
+  object-fit: cover; /* quan trọng */
+  object-position: center;
+  display: block;
+  border-bottom: 1px solid #e0e0e0;
+}
 .hover-move-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.25) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25) !important;
 }
-
