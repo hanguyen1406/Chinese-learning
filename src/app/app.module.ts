@@ -54,6 +54,7 @@ import { CommonModule } from '@angular/common';
 import { AddQuestionComponent } from './components/quizs-management/detail-quiz/add-question/add-question.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTabsModule } from '@angular/material/tabs';
+import { RatingDialogComponent } from './components/courses-management/detail-course/rating-dialog/rating-dialog.component';
 
 @NgModule({
   declarations: [
@@ -76,6 +77,7 @@ import { MatTabsModule } from '@angular/material/tabs';
     AddQuizComponent,
     DetailQuizComponent,
     AddQuestionComponent,
+    RatingDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -108,7 +110,7 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatSidenavModule,
     CommonModule,
     MatRadioModule,
-    MatTabsModule
+    MatTabsModule,
   ],
   providers: [
     authInterceptorProviders,

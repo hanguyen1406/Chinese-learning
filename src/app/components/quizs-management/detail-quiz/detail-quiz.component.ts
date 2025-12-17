@@ -221,21 +221,24 @@ export class DetailQuizComponent implements OnInit, OnDestroy {
     });
   }
   submitQuiz() {
+    if (confirm('Bạn chắn chắn nộp bài chứ?')) {
+      this.stopTimer();
+      this.quizService.submitQuiz(+this.idQuiz).subscribe({
+        next: (res) => {
+          this.getResultQuiz();
+        },
+        error: (err) => {
+          this.ngxNotificationMsgService.open({
+            status: NgxNotificationStatusMsg.FAILURE,
+            header: 'Lỗi',
+            messages: [err.error?.message || 'Có lỗi khi nộp bài'],
+            direction: NgxNotificationDirection.BOTTOM_RIGHT,
+          });
+        },
+      });
+    }
+
     //cập nhật finished_at
-    this.stopTimer();
-    this.quizService.submitQuiz(+this.idQuiz).subscribe({
-      next: (res) => {
-        this.getResultQuiz();
-      },
-      error: (err) => {
-        this.ngxNotificationMsgService.open({
-          status: NgxNotificationStatusMsg.FAILURE,
-          header: 'Lỗi',
-          messages: [err.error?.message || 'Có lỗi khi nộp bài'],
-          direction: NgxNotificationDirection.BOTTOM_RIGHT,
-        });
-      },
-    });
   }
   // Lấy quiz
   getQuizById() {

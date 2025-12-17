@@ -54,14 +54,13 @@
                 <div (click)="doQuiz(q.id)" class="test">Bắt đầu làm</div>
               </div>
 
-              <!-- ⭐ Checkbox bài test bắt buộc (chỉ admin thấy) -->
               <div
-                *ngIf="role === 'ROLE_ADMINISTRATOR'"
                 class="required-checkbox"
               >
                 <mat-checkbox
                   [(ngModel)]="q.required"
                   (change)="updateRequired(q)"
+                  [disabled]="role !== 'ROLE_ADMINISTRATOR'"
                 >
                   Bài test kết thúc khóa học
                 </mat-checkbox>

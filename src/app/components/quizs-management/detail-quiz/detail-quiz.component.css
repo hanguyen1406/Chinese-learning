@@ -129,18 +129,18 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-::ng-deep .mat-checkbox.correct .mat-checkbox-background {
+::ng-deep .question-container .mat-checkbox.correct .mat-checkbox-background {
   background-color: #4caf50 !important; /* xanh lá */
 }
 
-::ng-deep .mat-checkbox.wrong .mat-checkbox-background {
+::ng-deep .question-container .mat-checkbox.wrong .mat-checkbox-background {
   background-color: #f44336 !important; /* đỏ */
 }
 
-::ng-deep .mat-checkbox-checked .mat-checkbox-checkmark-path {
+::ng-deep .question-container .mat-checkbox-checked .mat-checkbox-checkmark-path {
   stroke: white !important;
 }
-::ng-deep .mat-checkbox .mat-checkbox-inner-container {
+::ng-deep .question-container .mat-checkbox .mat-checkbox-inner-container {
   margin-right: 8px;
   margin-bottom: 12px;
 }

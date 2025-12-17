@@ -1,0 +1,59 @@
+<h2 class="modal-title text-center mb-0">
+  <b>{{ data.existingRating ? "Cập nhật đánh giá" : "Đánh giá khóa học" }}</b>
+</h2>
+
+<div mat-dialog-content class="modal-body">
+  <p class="text-center text-muted mb-3">{{ data.courseName }}</p>
+
+  <!-- Chọn số sao -->
+  <div class="star-rating text-center mb-4">
+    <p class="mb-2">Bạn đánh giá khóa học này như thế nào?</p>
+    <div class="stars-row">
+      <span
+        *ngFor="let star of stars"
+        class="star"
+        [ngClass]="getStarClass(star)"
+        (click)="selectStar(star)"
+        (mouseenter)="onMouseEnter(star)"
+        (mouseleave)="onMouseLeave()"
+      >
+        ★
+      </span>
+    </div>
+    <p class="star-text mt-2" *ngIf="selectedStar > 0">
+      {{ selectedStar }} / 5 sao
+    </p>
+    <p class="star-text mt-2 text-danger" *ngIf="selectedStar === 0">
+      Vui lòng chọn số sao
+    </p>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="form-group">
+      <label for="content">Nội dung đánh giá</label>
+      <textarea
+        id="content"
+        class="form-control"
+        formControlName="content"
+        rows="4"
+        placeholder="Chia sẻ trải nghiệm của bạn về khóa học này..."
+        maxlength="1000"
+      ></textarea>
+      <small class="form-text text-muted">
+        {{ form.get("content")?.value?.length || 0 }} / 1000 ký tự
+      </small>
+    </div>
+  </form>
+</div>
+
+<div mat-dialog-actions class="modal-footer">
+  <button type="button" class="btn btn-light" (click)="close()">Hủy</button>
+  <button
+    type="button"
+    class="btn btn-warning"
+    [disabled]="selectedStar === 0"
+    (click)="submit()"
+  >
+    {{ data.existingRating ? "Cập nhật" : "Gửi đánh giá" }}
+  </button>
+</div>

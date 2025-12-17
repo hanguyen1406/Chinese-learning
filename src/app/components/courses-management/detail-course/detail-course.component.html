@@ -50,9 +50,9 @@
   <div class="row mt-2">
     <!-- Vùng video + nội dung -->
     <div class="col-md-9">
-      <h3 *ngIf="!hasLessons" class="text-center">
+      <h2 *ngIf="!hasLessons" class="text-center">
         Khóa học này chưa có bài giảng nào
-      </h3>
+      </h2>
       <div #video class="video-container" *ngIf="videoId">
         <div class="video-wrapper shadow-sm">
           <!-- Thêm id cho iframe để YouTube API có thể nhận diện -->
@@ -80,7 +80,7 @@
     </div>
 
     <!-- Vùng danh sách bài học bên phải -->
-    <div class="col-md-3">
+    <div *ngIf="hasLessons" class="col-md-3">
       <h3>Nội dung Khóa học</h3>
 
       <div #lessonList class="lesson-cards shadow-sm">
@@ -124,9 +124,28 @@
           </div>
         </div>
       </div>
+
+      <!-- Nút đánh giá (chỉ hiện cho user, không hiện cho admin) -->
+      <div
+        class="rating-button-container"
+        *ngIf="role !== 'ROLE_ADMINISTRATOR'"
+      >
+        <button
+          (click)="openRatingDialog()"
+          mat-raised-button
+          class="rating-button"
+        >
+          <mat-icon>star</mat-icon>
+          {{
+            userRating
+              ? "Sửa đánh giá (" + userRating.numStar + "★)"
+              : "Đánh giá khóa học"
+          }}
+        </button>
+      </div>
     </div>
   </div>
-  <div id="cmt">
+  <div *ngIf="hasLessons" id="cmt">
     <button
       (click)="openComment()"
       mat-raised-button

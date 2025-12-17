@@ -19,6 +19,9 @@ import {
 } from 'ngx-notification-msg';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { LessonProgress } from '../../../model/lessonProgress';
+import { RatingService } from '../../../service/rating/rating.service';
+import { RatingDialogComponent } from './rating-dialog/rating-dialog.component';
+import { Rating } from '../../../model/rating';
 
 @Component({
   selector: 'app-detail-course',
@@ -56,6 +59,10 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
   shouldSeekToSavedTime = false;
   progressMap: Map<number, LessonProgress> = new Map();
 
+  // Rating
+  userRating?: Rating;
+  averageRating: number = 0;
+
   @ViewChild('video') videoContainer!: ElementRef;
   @ViewChild('ytIframe') ytIframe!: ElementRef<HTMLIFrameElement>;
   @ViewChild('lessonList') lessonList!: ElementRef;
@@ -67,7 +74,8 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
     private lessonService: LessonService,
     private dialog: MatDialog,
     private ngxNotificationMsgService: NgxNotificationMsgService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private ratingService: RatingService
   ) {}
 
   ngOnInit(): void {
@@ -80,6 +88,10 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
 
     this.getDetailCourse();
     this.getLessonsOfCourse();
+
+    // Load rating
+    this.loadUserRating();
+    this.loadAverageRating();
 
     // Load YouTube IFrame API
     this.loadYouTubeAPI();
@@ -94,7 +106,7 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
 
       (window as any).onYouTubeIframeAPIReady = () => {
         this.YT = (window as any).YT;
-        console.log('YouTube API ready');
+        // console.log('YouTube API ready');
       };
     } else {
       this.YT = (window as any).YT;
@@ -133,10 +145,10 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
 
     // Kiểm tra xem có progress đã lưu không
     this.savedProgress = this.progressMap.get(lesson.id!);
-    console.log('Progress cho lesson', lesson.id, ':', this.savedProgress);
+    // console.log('Progress cho lesson', lesson.id, ':', this.savedProgress);
     if (this.savedProgress && this.savedProgress.watchedTime > 0) {
       this.shouldSeekToSavedTime = true;
-      console.log('Sẽ seek đến:', this.savedProgress.watchedTime, 'giây');
+      // console.log('Sẽ seek đến:', this.savedProgress.watchedTime, 'giây');
     } else {
       this.shouldSeekToSavedTime = false;
     }
@@ -352,9 +364,8 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
 
   /** Lấy danh sách bài học */
   getLessonsOfCourse() {
-    this.lessonService
-      .getLessonsOfCourse(+this.idCourse)
-      .subscribe((lessons: any) => {
+    this.lessonService.getLessonsOfCourse(+this.idCourse).subscribe({
+      next: (lessons: any) => {
         this.lessons = lessons;
         if (lessons.length > 0) {
           this.hasLessons = true;
@@ -375,7 +386,17 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
             this.selectLesson(this.lessons[0]);
           });
         }
-      });
+      },
+      error: (err) => {
+        this.ngxNotificationMsgService.open({
+          status: NgxNotificationStatusMsg.FAILURE,
+          header: 'Lỗi',
+          messages: [err.error.message],
+          direction: NgxNotificationDirection.BOTTOM_RIGHT,
+          delay: 5000,
+        });
+      },
+    });
   }
 
   /** Load tất cả progress của user cho khóa học này */
@@ -463,6 +484,78 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
     if (this.player && this.player.pauseVideo) {
       this.player.pauseVideo();
     }
+  }
+
+  // ========== RATING FUNCTIONS ==========
+
+  /** Load đánh giá của user hiện tại */
+  loadUserRating(): void {
+    if (this.role !== 'ROLE_ADMINISTRATOR') {
+      this.ratingService
+        .getRatingByUserAndCourse(Number(this.idCourse))
+        .subscribe({
+          next: (rating) => {
+            this.userRating = rating;
+          },
+          error: () => {
+            this.userRating = undefined;
+          },
+        });
+    }
+  }
+
+  /** Load điểm trung bình */
+  loadAverageRating(): void {
+    this.ratingService.getAverageRating(Number(this.idCourse)).subscribe({
+      next: (avg) => {
+        this.averageRating = avg || 0;
+      },
+      error: () => {
+        this.averageRating = 0;
+      },
+    });
+  }
+
+  /** Mở dialog đánh giá */
+  openRatingDialog(): void {
+    const dialogRef = this.dialog.open(RatingDialogComponent, {
+      width: '500px',
+      disableClose: true,
+      data: {
+        courseId: Number(this.idCourse),
+        courseName: this.course?.name,
+        existingRating: this.userRating,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: Rating) => {
+      if (result) {
+        this.ratingService.saveRating(result).subscribe({
+          next: (savedRating) => {
+            this.userRating = savedRating;
+            this.loadAverageRating();
+            this.ngxNotificationMsgService.open({
+              status: NgxNotificationStatusMsg.SUCCESS,
+              header: 'Thành công',
+              messages: [
+                this.userRating
+                  ? 'Cập nhật đánh giá thành công!'
+                  : 'Gửi đánh giá thành công!',
+              ],
+              direction: NgxNotificationDirection.BOTTOM_RIGHT,
+            });
+          },
+          error: (err) => {
+            this.ngxNotificationMsgService.open({
+              status: NgxNotificationStatusMsg.FAILURE,
+              header: 'Lỗi',
+              messages: [err.error?.message || 'Không thể gửi đánh giá'],
+              direction: NgxNotificationDirection.BOTTOM_RIGHT,
+            });
+          },
+        });
+      }
+    });
   }
 
   ngOnDestroy() {
