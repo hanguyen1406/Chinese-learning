@@ -1,5 +1,7 @@
 <!-- course-create-dialog.component.html -->
-<h3 class="modal-title text-center mb-0"><b>Thêm khóa học</b></h3>
+<h3 class="modal-title text-center mb-0">
+  <b>{{ isEditMode ? "Cập nhật khóa học" : "Thêm khóa học" }}</b>
+</h3>
 
 <div mat-dialog-content class="modal-body">
   <form [formGroup]="form" (ngSubmit)="submit()">
@@ -46,7 +48,11 @@
       <div class="form-group col-md-6">
         <label for="prereqCourseId">Khóa cần hoàn thành</label>
         <mat-form-field appearance="outline" class="w-100">
-          <mat-select id="prereqCourseId" formControlName="prereqCourseId">
+          <mat-select
+            id="prereqCourseId"
+            formControlName="prereqCourseId"
+            [compareWith]="compareCourseId"
+          >
             <mat-option [value]="null">-- Không yêu cầu --</mat-option>
             <mat-option *ngFor="let course of courses" [value]="course.id">
               {{ course.name }}
@@ -78,6 +84,6 @@
     (click)="submit()"
     [disabled]="form.invalid"
   >
-    Lưu
+    {{ isEditMode ? "Cập nhật" : "Lưu" }}
   </button>
 </div>

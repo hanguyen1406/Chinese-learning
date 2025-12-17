@@ -66,4 +66,34 @@ export class CoursesManagementComponent implements OnInit {
   getImageUrl(img: any) {
     return img || 'assets/course.jpg';
   }
+  openEdit(course: Course) {
+    const ref = this.dialog.open(AddCourseComponent, {
+      width: '640px',
+      disableClose: true,
+      data: course,
+    });
+
+    ref.afterClosed().subscribe((data?: Course) => {
+      if (!data) return;
+      this.courseSvc.createCourse(data).subscribe({
+        next: () => {
+          this.getAllCourses();
+          this.ngxNotificationMsgService.open({
+            status: NgxNotificationStatusMsg.SUCCESS,
+            header: 'Thành công',
+            messages: ['Cập nhật khóa học thành công'],
+            direction: NgxNotificationDirection.BOTTOM_RIGHT,
+          });
+        },
+        error: (err) => {
+          this.ngxNotificationMsgService.open({
+            status: NgxNotificationStatusMsg.FAILURE,
+            header: 'Lỗi',
+            messages: [err.error.message],
+            direction: NgxNotificationDirection.BOTTOM_RIGHT,
+          });
+        },
+      });
+    });
+  }
 }

@@ -29,37 +29,47 @@
 
     <div *ngIf="courses && courses.length > 0; else noCourses" class="row mt-4">
       <div class="col-sm-6 col-lg-4 mb-4" *ngFor="let c of courses">
-        <a [routerLink]="['/coursestable', c.id]" class="text-decoration-none">
-          <div
-            style="border-radius: 15px; height: 280px"
-            class="shadow border-0 hover-move-card cursor-pointer"
+        <div
+          style="border-radius: 15px; height: 280px"
+          class="shadow border-0 hover-move-card cursor-pointer"
+        >
+          <a
+            [routerLink]="['/coursestable', c.id]"
+            class="text-decoration-none"
           >
             <img class="course-img" [src]="getImageUrl(c.thumbnailUrl)" />
+          </a>
 
-            <div class="card-body p-2">
+          <div class="card-body p-2">
+            <a
+              [routerLink]="['/coursestable', c.id]"
+              class="text-decoration-none"
+            >
               <h4 class="card-title m-0 text-truncate" [title]="c.name">
                 <b>
                   {{ c.name }}
                 </b>
               </h4>
-              <div
-                class="text-danger font-weight-bold d-flex justify-content-between"
-              >
-                <span>Miễn phí</span>
-                <span class="edit-icon">
-                  <mat-icon style="font-size: 18px; height: 18px; width: 18px;">edit</mat-icon>
-                </span>
-              </div>
-            </div>
-
-            <div style="color: black" class="border-0">
-              <ul class="d-flex justify-content-center p-0">
-                <li class="list-inline-item mr-3">⭐ {{ c.numRating }}</li>
-                <li class="list-inline-item mr-3">▶️ {{ c.numLesson }}</li>
-              </ul>
+            </a>
+            <div
+              class="text-danger font-weight-bold d-flex justify-content-between"
+            >
+              <span>Miễn phí</span>
+              <span *ngIf="role == 'ROLE_ADMINISTRATOR'" (click)="openEdit(c)" class="edit-icon">
+                <mat-icon style="font-size: 18px; height: 18px; width: 18px"
+                  >edit</mat-icon
+                >
+              </span>
             </div>
           </div>
-        </a>
+
+          <div style="color: black" class="border-0">
+            <ul class="d-flex justify-content-center p-0">
+              <li class="list-inline-item mr-3">⭐ {{ c.numRating }}</li>
+              <li class="list-inline-item mr-3">▶️ {{ c.numLesson }}</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
     <ng-template #noCourses>
