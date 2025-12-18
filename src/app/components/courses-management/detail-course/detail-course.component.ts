@@ -12,16 +12,12 @@ import { AddLessonComponent } from './add-lesson/add-lesson.component';
 import { MatDialog } from '@angular/material/dialog';
 import { LessonService } from '../../../service/lesson/lesson.service';
 import { Lesson } from '../../../model/lesson';
-import {
-  NgxNotificationDirection,
-  NgxNotificationMsgService,
-  NgxNotificationStatusMsg,
-} from 'ngx-notification-msg';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { LessonProgress } from '../../../model/lessonProgress';
 import { RatingService } from '../../../service/rating/rating.service';
 import { RatingDialogComponent } from './rating-dialog/rating-dialog.component';
 import { Rating } from '../../../model/rating';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-detail-course',
@@ -73,7 +69,6 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
     private courseService: CourseService,
     private lessonService: LessonService,
     private dialog: MatDialog,
-    private ngxNotificationMsgService: NgxNotificationMsgService,
     private sanitizer: DomSanitizer,
     private ratingService: RatingService
   ) {}
@@ -388,12 +383,17 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
         }
       },
       error: (err) => {
-        this.ngxNotificationMsgService.open({
-          status: NgxNotificationStatusMsg.FAILURE,
-          header: 'Lỗi',
-          messages: [err.error.message],
-          direction: NgxNotificationDirection.BOTTOM_RIGHT,
-          delay: 5000,
+        const errorMsg =
+          err?.error?.message ||
+          err?.message ||
+          'Không thể tải danh sách bài học';
+        Swal.fire({
+          icon: 'error',
+          text: errorMsg,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 5000,
+          timerProgressBar: true,
         });
       },
     });
@@ -454,11 +454,15 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
       this.lessonService.createLesson(data).subscribe({
         next: () => this.getLessonsOfCourse(),
         error: (err) =>
-          this.ngxNotificationMsgService.open({
-            status: NgxNotificationStatusMsg.FAILURE,
-            header: 'Lỗi',
-            messages: [err.error.message],
-            direction: NgxNotificationDirection.BOTTOM_RIGHT,
+          Swal.fire({
+            icon: 'error',
+            title: 'Lỗi',
+            text: err?.error?.message || 'Không thể tạo bài học',
+            toast: true,
+            position: 'bottom-end',
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true,
           }),
       });
     });
@@ -534,23 +538,27 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
           next: (savedRating) => {
             this.userRating = savedRating;
             this.loadAverageRating();
-            this.ngxNotificationMsgService.open({
-              status: NgxNotificationStatusMsg.SUCCESS,
-              header: 'Thành công',
-              messages: [
-                this.userRating
-                  ? 'Cập nhật đánh giá thành công!'
-                  : 'Gửi đánh giá thành công!',
-              ],
-              direction: NgxNotificationDirection.BOTTOM_RIGHT,
+            Swal.fire({
+              icon: 'success',
+              title: 'Thành công',
+              text: 'Đánh giá đã được lưu!',
+              toast: true,
+              position: 'bottom-end',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
             });
           },
           error: (err) => {
-            this.ngxNotificationMsgService.open({
-              status: NgxNotificationStatusMsg.FAILURE,
-              header: 'Lỗi',
-              messages: [err.error?.message || 'Không thể gửi đánh giá'],
-              direction: NgxNotificationDirection.BOTTOM_RIGHT,
+            Swal.fire({
+              icon: 'error',
+              title: 'Lỗi',
+              text: err?.error?.message || 'Không thể gửi đánh giá',
+              toast: true,
+              position: 'bottom-end',
+              showConfirmButton: false,
+              timer: 5000,
+              timerProgressBar: true,
             });
           },
         });

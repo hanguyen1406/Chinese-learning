@@ -5,6 +5,11 @@ import { AddQuizComponent } from './add-quiz/add-quiz.component';
 import { Quiz } from '../../model/quiz';
 import { QuizService } from '../../service/quiz/quiz.service';
 import { Router } from '@angular/router';
+import {
+  NgxNotificationDirection,
+  NgxNotificationMsgService,
+  NgxNotificationStatusMsg,
+} from 'ngx-notification-msg';
 
 @Component({
   selector: 'app-quizs-management',
@@ -16,7 +21,8 @@ export class QuizsManagementComponent implements OnInit {
     private tokenStorageService: TokenStorageService,
     private dialog: MatDialog,
     private quizService: QuizService,
-    private router: Router
+    private router: Router,
+    private readonly ngxNotificationMsgService: NgxNotificationMsgService
   ) {}
 
   role: string = '';
@@ -71,16 +77,24 @@ export class QuizsManagementComponent implements OnInit {
     if (el) el.scrollLeft -= 300; // tốc độ cuộn
   }
   updateRequired(quiz: any) {
-    const payload = { required: quiz.required };
-
-    // this.quizService.updateQuiz(quiz.id, payload).subscribe({
-    //   next: () => {
-    //     console.log('✔ Đã cập nhật trạng thái bắt buộc:', payload);
-    //   },
-    //   error: (err) => {
-    //     console.error('❌ Lỗi cập nhật quiz:', err);
-    //   },
-    // });
+    this.quizService.updateRequired(quiz).subscribe({
+      next: () => {
+        this.ngxNotificationMsgService.open({
+          status: NgxNotificationStatusMsg.SUCCESS,
+          header: 'Thành công',
+          messages: ['Cập nhật trạng thái thành công'],
+          direction: NgxNotificationDirection.BOTTOM_RIGHT,
+        });
+      },
+      error: (err) => {
+        this.ngxNotificationMsgService.open({
+          status: NgxNotificationStatusMsg.FAILURE,
+          header: 'Lỗi',
+          messages: [err?.error?.message || 'Cập nhật trạng thái thất bại'],
+          direction: NgxNotificationDirection.BOTTOM_RIGHT,
+        });
+      },
+    });
   }
 
   scrollRight(courseName: string) {

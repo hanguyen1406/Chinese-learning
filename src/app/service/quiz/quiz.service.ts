@@ -36,6 +36,9 @@ export class QuizService {
   updateQuiz(quiz: Quiz) {
     return this.http.put(API_URL, quiz);
   }
+  updateRequired(quiz: Quiz) {
+    return this.http.put(`${API_URL}/required`, quiz);
+  }
   getAllQuiz() {
     return this.http.get<Quiz[]>(API_URL);
   }

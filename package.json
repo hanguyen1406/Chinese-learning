@@ -24,11 +24,12 @@
     "@fortawesome/fontawesome-free": "^7.1.0",
     "bootstrap": "^4.4.1",
     "country-state-city": "^3.0.1",
+    "jquery": "^3.7.1",
     "mammoth": "^1.11.0",
     "material-icons": "^1.13.14",
     "ngx-notification-msg": "^0.2.2",
     "rxjs": "~6.5.5",
-    "sweetalert2": "^11.26.4",
+    "sweetalert2": "^11.26.10",
     "xlsx": "^0.18.5",
     "zone.js": "~0.10.3"
   },
