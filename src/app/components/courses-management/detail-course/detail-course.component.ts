@@ -407,7 +407,7 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
         progressList.forEach((p) => {
           this.progressMap.set(p.lessonId, p);
         });
-        console.log('Loaded progress:', this.progressMap);
+        // console.log('Loaded progress:', this.progressMap);
 
         // Progress đã được sắp xếp giảm dần theo lastAccessedAt
         // Phần tử đầu tiên là lesson mới nhất user vừa xem
@@ -416,7 +416,7 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
         if (callback) callback(lastViewedLessonId);
       },
       error: (err) => {
-        console.log('Chưa có progress hoặc lỗi:', err);
+        // console.log('Chưa có progress hoặc lỗi:', err);
         if (callback) callback();
       },
     });
