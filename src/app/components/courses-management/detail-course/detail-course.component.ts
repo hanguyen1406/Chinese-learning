@@ -5,7 +5,7 @@ import {
   ViewChild,
   OnDestroy,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TokenStorageService } from '../../../service/token-storage/token-storage.service';
 import { CourseService } from '../../../service/course/course.service';
 import { AddLessonComponent } from './add-lesson/add-lesson.component';
@@ -70,7 +70,9 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
     private lessonService: LessonService,
     private dialog: MatDialog,
     private sanitizer: DomSanitizer,
-    private ratingService: RatingService
+    private ratingService: RatingService,
+    private router: Router
+    
   ) {}
 
   ngOnInit(): void {
@@ -391,9 +393,11 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
           icon: 'error',
           text: errorMsg,
           position: 'center',
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 5000,
           timerProgressBar: true,
+        }).then(() => {
+          this.router.navigate(['/coursestable']);
         });
       },
     });

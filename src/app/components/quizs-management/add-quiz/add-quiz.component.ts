@@ -26,7 +26,7 @@ export class AddQuizComponent implements OnInit {
       name: [this.data?.name || '', Validators.required],
       timeQuiz: [
         this.data?.timeQuiz || 0,
-        [Validators.required, Validators.min(1)],
+        [Validators.required, Validators.min(1), Validators.max(90),],
       ],
       courseId: [this.data?.courseId || null, Validators.required],
     });

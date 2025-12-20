@@ -1,26 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from 'src/app/service/auth/auth.service';
-import { TokenStorageService } from 'src/app/service/token-storage/token-storage.service';
+import { AuthService } from '../../../service/auth/auth.service';
+import { TokenStorageService } from '../../../service/token-storage/token-storage.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
-
   isLoginFailed = false;
   errorMessage = '';
   roles: string[] = [];
   hidePassword = true;
 
-  formLogin : FormGroup = new FormGroup({
-    "username" : new FormControl(null, [Validators.required]),
-    "password" : new FormControl(null, [Validators.required])
+  formLogin: FormGroup = new FormGroup({
+    username: new FormControl(null, [Validators.required]),
+    password: new FormControl(null, [Validators.required]),
   });
 
-  constructor(private authService: AuthService, private tokenStorage: TokenStorageService) { }
+  constructor(
+    private authService: AuthService,
+    private tokenStorage: TokenStorageService
+  ) {}
 
   ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
@@ -30,14 +32,14 @@ export class LoginComponent implements OnInit {
 
   login(): void {
     this.authService.login(this.formLogin.value).subscribe(
-      data => {
+      (data) => {
         this.tokenStorage.saveToken(data.accessToken);
         this.tokenStorage.saveUser(data);
         this.isLoginFailed = false;
         this.roles = this.tokenStorage.getUser().roles;
         this.reloadPage();
       },
-      err => {
+      (err) => {
         this.errorMessage = err.error.message;
         this.isLoginFailed = true;
       }
@@ -45,7 +47,6 @@ export class LoginComponent implements OnInit {
   }
 
   reloadPage(): void {
-    window.location.href="home"
+    window.location.href = 'home';
   }
-
 }
