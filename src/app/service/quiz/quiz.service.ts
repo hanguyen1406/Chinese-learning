@@ -4,6 +4,8 @@ import { Quiz } from '../../model/quiz';
 import { HttpClient } from '@angular/common/http';
 import { Question } from '../../model/question';
 import { ScoreQuiz } from '../../model/scoreQuiz';
+import { QuizHistory } from '../../model/quizHistory';
+import { Observable } from 'rxjs';
 
 const API_URL = `${API_PATH}/quiz`;
 @Injectable({
@@ -41,5 +43,12 @@ export class QuizService {
   }
   getAllQuiz() {
     return this.http.get<Quiz[]>(API_URL);
+  }
+
+  /**
+   * Lấy lịch sử làm quiz của user
+   */
+  getQuizHistory(): Observable<QuizHistory[]> {
+    return this.http.get<QuizHistory[]>(`${API_URL}/history`);
   }
 }

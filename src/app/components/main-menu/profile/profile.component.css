@@ -118,3 +118,88 @@ body {
   padding: 0.7em 0 0.7em 0 !important;
   top: -0.25em;
 }
+
+/* Quiz History Styles */
+.card-title {
+  font-weight: 600;
+  color: #333;
+}
+
+.card-title i {
+  margin-right: 8px;
+}
+
+.stat-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.score-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.score-excellent {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.score-good {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.score-average {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.score-poor {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.table th {
+  font-weight: 600;
+  color: #555;
+  border-top: none;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.badge-primary {
+  background-color: #bb254a;
+}
+
+.btn-outline-primary {
+  color: #bb254a;
+  border-color: #bb254a;
+}
+
+.btn-outline-primary:hover {
+  background-color: #bb254a;
+  color: white;
+}
+
+.btn-outline-info {
+  color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-outline-info:hover {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.table-responsive {
+  max-height: 400px;
+  overflow-y: auto;
+}

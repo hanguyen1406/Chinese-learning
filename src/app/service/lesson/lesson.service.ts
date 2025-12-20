@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Comment } from '../../model/comment';
+import { Comment, CommentWithReplies } from '../../model/comment';
 import { API_PATH } from '../../service/const';
 import { LessonProgress } from '../../model/lessonProgress';
 import { Observable } from 'rxjs';
@@ -19,12 +19,22 @@ export class LessonService {
   createLesson(lesson: any) {
     return this.http.post(API_URL, lesson);
   }
-  commentLesson(comment: Comment) {
-    return this.http.post(`${API_URL}/comment`, comment);
+  commentLesson(comment: Comment): Observable<Comment> {
+    return this.http.post<Comment>(`${API_URL}/comment`, comment);
   }
   getAllComment(lessonId: number) {
     return this.http.get(`${API_URL}/comments/${lessonId}`);
   }
+
+  /**
+   * Lấy comments với cấu trúc 2 cấp (parent và replies)
+   */
+  getCommentsWithReplies(lessonId: number): Observable<CommentWithReplies[]> {
+    return this.http.get<CommentWithReplies[]>(
+      `${API_URL}/comments-with-replies/${lessonId}`
+    );
+  }
+
   getLessonsOfCourse(courseId: number) {
     return this.http.get(`${API_URL}/lessonOfCourse/${courseId}`);
   }

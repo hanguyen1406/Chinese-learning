@@ -55,6 +55,7 @@ import { AddQuestionComponent } from './components/quizs-management/detail-quiz/
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTabsModule } from '@angular/material/tabs';
 import { RatingDialogComponent } from './components/courses-management/detail-course/rating-dialog/rating-dialog.component';
+import { ClickOutsideDirective } from './helper/click-outside.directive';
 
 @NgModule({
   declarations: [
@@ -78,6 +79,7 @@ import { RatingDialogComponent } from './components/courses-management/detail-co
     DetailQuizComponent,
     AddQuestionComponent,
     RatingDialogComponent,
+    ClickOutsideDirective,
   ],
   imports: [
     BrowserModule,

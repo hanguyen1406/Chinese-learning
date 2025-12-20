@@ -74,6 +74,69 @@
       </ul>
 
       <ul class="navbar-nav ml-auto align-items-center" *ngIf="isLoggedIn">
+        <!-- Notification Bell -->
+        <li
+          class="nav-item notification-item"
+          (clickOutside)="closeNotificationDropdown()"
+        >
+          <a
+            class="nav-link notification-bell"
+            (click)="toggleNotificationDropdown()"
+          >
+            <i class="fa fa-bell"></i>
+            <span *ngIf="unreadCount > 0" class="notification-badge">{{
+              unreadCount > 9 ? "9+" : unreadCount
+            }}</span>
+          </a>
+
+          <!-- Notification Dropdown -->
+          <div class="notification-dropdown" *ngIf="showNotificationDropdown">
+            <div class="notification-header">
+              <h6>Thông báo</h6>
+              <a
+                *ngIf="unreadCount > 0"
+                (click)="markAllAsRead()"
+                class="mark-all-read"
+                >Đánh dấu tất cả đã đọc</a
+              >
+            </div>
+            <div class="notification-list">
+              <div
+                *ngFor="let notification of notifications"
+                class="notification-item-content"
+                [class.unread]="notification.status === 'UNREAD'"
+                (click)="onNotificationClick(notification)"
+              >
+                <div class="notification-icon">
+                  <i
+                    class="fa fa-comment"
+                    *ngIf="notification.type === 'COMMENT_REPLY'"
+                  ></i>
+                  <i
+                    class="fa fa-bell"
+                    *ngIf="notification.type !== 'COMMENT_REPLY'"
+                  ></i>
+                </div>
+                <div class="notification-content">
+                  <p class="notification-message">{{ notification.message }}</p>
+                  <small class="notification-time">{{
+                    notification.time | date : "dd/MM/yyyy HH:mm"
+                  }}</small>
+                </div>
+                <button
+                  class="delete-notification"
+                  (click)="deleteNotification(notification, $event)"
+                >
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+              <div *ngIf="notifications.length === 0" class="no-notifications">
+                <p>Không có thông báo nào</p>
+              </div>
+            </div>
+          </div>
+        </li>
+
         <li class="nav-item">
           <a class="nav-link" routerLink="profile" (click)="close()">{{
             username

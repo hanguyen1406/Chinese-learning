@@ -2,14 +2,157 @@
   background-color: #f2f9ff;
   border: 0px;
   border-radius: 10px;
-  padding: 5px;
+  padding: 10px 15px;
+  font-size: 14px;
 }
-.btn{
-    border-radius: 20px;
-    font-size: small;
-    background-color: #bb254a;
+
+#comment-input:focus {
+  outline: none;
+  background-color: #e8f4ff;
 }
-.cmtList{
+
+.btn {
+  border-radius: 20px;
+  font-size: small;
+  background-color: #bb254a;
+  color: white;
+  padding: 8px 20px;
+}
+
+.btn:hover {
+  background-color: #a01f40;
+}
+
+.cmtList {
   height: 520px;
   overflow-y: auto;
+}
+
+.avatar-img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-img-small {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-item {
+  padding: 10px;
+  border-radius: 10px;
+  transition: background-color 0.2s;
+}
+
+.comment-item:hover {
+  background-color: #f8f9fa;
+}
+
+.comment-content {
+  background-color: #f0f2f5;
+  padding: 10px 15px;
+  border-radius: 15px;
+}
+
+.comment-actions {
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+.action-divider {
+  margin: 0 8px;
+  color: #65676b;
+}
+
+.reply-link,
+.toggle-replies-link {
+  color: #bb254a;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.reply-link:hover,
+.toggle-replies-link:hover {
+  text-decoration: underline;
+}
+
+/* Reply form */
+.reply-form {
+  padding-left: 10px;
+  border-left: 2px solid #e4e6eb;
+}
+
+.reply-input {
+  width: 100%;
+  background-color: #f2f9ff;
+  border: 0px;
+  border-radius: 20px;
+  padding: 8px 15px;
+  font-size: 13px;
+}
+
+.reply-input:focus {
+  outline: none;
+  background-color: #e8f4ff;
+}
+
+.reply-buttons {
+  gap: 8px;
+}
+
+.btn-cancel {
+  background-color: #e4e6eb;
+  border: none;
+  border-radius: 15px;
+  padding: 5px 15px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #65676b;
+}
+
+.btn-cancel:hover {
+  background-color: #d8dadf;
+}
+
+.btn-reply {
+  background-color: #bb254a;
+  border: none;
+  border-radius: 15px;
+  padding: 5px 15px;
+  font-size: 12px;
+  cursor: pointer;
+  color: white;
+}
+
+.btn-reply:hover {
+  background-color: #a01f40;
+}
+
+/* Replies container */
+.replies-container {
+  padding-left: 15px;
+  border-left: 2px solid #e4e6eb;
+  margin-left: 10px;
+}
+
+.reply-item {
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.reply-item:hover {
+  background-color: #f8f9fa;
+}
+
+.reply-content {
+  background-color: #f0f2f5;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.reply-content p {
+  margin-bottom: 0;
 }

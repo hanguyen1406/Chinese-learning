@@ -18,6 +18,7 @@ import { RatingService } from '../../../service/rating/rating.service';
 import { RatingDialogComponent } from './rating-dialog/rating-dialog.component';
 import { Rating } from '../../../model/rating';
 import Swal from 'sweetalert2';
+import { CommentLessonComponent } from './comment-lesson/comment-lesson.component';
 
 @Component({
   selector: 'app-detail-course',
@@ -62,6 +63,7 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
   @ViewChild('video') videoContainer!: ElementRef;
   @ViewChild('ytIframe') ytIframe!: ElementRef<HTMLIFrameElement>;
   @ViewChild('lessonList') lessonList!: ElementRef;
+  @ViewChild('commentSection') commentSection!: CommentLessonComponent;
 
   constructor(
     private route: ActivatedRoute,
@@ -72,7 +74,6 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private ratingService: RatingService,
     private router: Router
-    
   ) {}
 
   ngOnInit(): void {
@@ -92,6 +93,58 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
 
     // Load YouTube IFrame API
     this.loadYouTubeAPI();
+
+    // Xử lý query params từ notification
+    this.route.queryParams.subscribe((params) => {
+      if (params['lessonId']) {
+        this.navigateToLessonFromNotification(
+          +params['lessonId'],
+          params['showComment'] === 'true'
+        );
+      }
+    });
+  }
+
+  /**
+   * Điều hướng đến lesson từ notification
+   */
+  navigateToLessonFromNotification(
+    lessonId: number,
+    openComment: boolean = false
+  ): void {
+    // Đợi lessons được load xong
+    const checkLessonsInterval = setInterval(() => {
+      if (this.lessons.length > 0) {
+        clearInterval(checkLessonsInterval);
+
+        const targetLesson = this.lessons.find((l) => l.id === lessonId);
+        if (targetLesson) {
+          this.selectLesson(targetLesson);
+
+          // Nếu cần mở comment
+          if (openComment) {
+            setTimeout(() => {
+              this.showComment = true;
+
+              // Đợi comment section render xong
+              setTimeout(() => {
+                if (this.commentSection) {
+                  // Mở rộng tất cả replies
+                  this.commentSection.expandAllReplies();
+                  // Cuộn đến phần bình luận
+                  this.commentSection.scrollToCommentSection();
+                }
+              }, 300);
+            }, 500);
+          }
+        }
+      }
+    }, 100);
+
+    // Timeout sau 5 giây nếu không tìm thấy
+    setTimeout(() => {
+      clearInterval(checkLessonsInterval);
+    }, 5000);
   }
 
   loadYouTubeAPI() {

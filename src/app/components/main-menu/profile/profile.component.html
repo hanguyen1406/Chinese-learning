@@ -13,7 +13,39 @@
               />
               <div class="mt-3">
                 <h4>{{ user?.name }} {{ user?.surname }}</h4>
+                <p class="text-muted mb-1">@{{ user?.username }}</p>
+                <p class="text-muted mb-1">
+                  <span
+                    *ngFor="let role of roles"
+                    class="badge badge-primary mr-1"
+                    >{{ role }}</span
+                  >
+                </p>
+                <p class="text-muted mb-0" *ngIf="user?.email_verified">
+                  <i class="fa fa-check-circle text-success"></i> Email đã xác
+                  thực
+                </p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thống kê -->
+        <div class="card mt-3">
+          <div class="card-body">
+            <h6 class="card-title">
+              <i class="fa fa-trophy text-warning"></i> Thành tích
+            </h6>
+            <div class="stat-item d-flex justify-content-between mb-2">
+              <span>Số bài kiểm tra đã làm:</span>
+              <strong>{{ quizHistory.length }}</strong>
+            </div>
+            <div
+              class="stat-item d-flex justify-content-between mb-2"
+              *ngIf="quizHistory.length > 0"
+            >
+              <span>Điểm trung bình:</span>
+              <strong>{{ getAverageScore() | number : "1.1-1" }}/10</strong>
             </div>
           </div>
         </div>
@@ -21,16 +53,20 @@
       <div class="col-lg-8">
         <div class="card" [formGroup]="formCreateEditUser" novalidate>
           <div class="card-body">
+            <h5 class="card-title mb-4">
+              <i class="fa fa-user"></i> Thông tin cá nhân
+            </h5>
+
             <div class="row mb-3">
               <div class="col-sm-3">
                 <h6 class="mb-0">Tên *</h6>
               </div>
               <div class="col-sm-9 text-secondary">
                 <input
-                  type="email"
+                  type="text"
                   name="name"
                   formControlName="name"
-                  placeholder="Enter Name"
+                  placeholder="Nhập tên"
                   class="form-control"
                 />
               </div>
@@ -44,7 +80,7 @@
                   type="text"
                   name="surname"
                   formControlName="surname"
-                  placeholder="Enter Surname"
+                  placeholder="Nhập họ"
                   class="form-control"
                 />
               </div>
@@ -58,7 +94,7 @@
                   type="email"
                   name="email"
                   formControlName="email"
-                  placeholder="Enter E-Mail"
+                  placeholder="Nhập email"
                   class="form-control"
                   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
                 />
@@ -66,8 +102,37 @@
                   [hidden]="
                     !formCreateEditUser.controls['email'].errors?.pattern
                   "
-                  >Please enter correct format</mat-error
+                  >Vui lòng nhập đúng định dạng email</mat-error
                 >
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Số điện thoại</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                <input
+                  type="tel"
+                  name="phone"
+                  formControlName="phone"
+                  placeholder="Nhập số điện thoại"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Ngày sinh</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                <input
+                  type="date"
+                  name="dateOfBirth"
+                  formControlName="dateOfBirth"
+                  class="form-control"
+                />
               </div>
             </div>
 
@@ -96,14 +161,14 @@
                     name="password"
                     [value]="password"
                     (change)="password = $event.target.value"
-                    placeholder="New password"
+                    placeholder="Mật khẩu mới"
                     class="form-control"
                   />
                 </div>
               </div>
             </div>
             <div class="alert alert-warning" *ngIf="isFailed">
-              Failed!<br />{{ errorMessage }}
+              Lỗi!<br />{{ errorMessage }}
             </div>
 
             <div class="row">
@@ -136,11 +201,81 @@
             </div>
           </div>
         </div>
+
+        <!-- Lịch sử bài kiểm tra -->
+        <div class="card mt-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="card-title mb-0">
+                <i class="fa fa-history"></i> Lịch sử bài kiểm tra
+              </h5>
+              <button
+                class="btn btn-sm btn-outline-primary"
+                (click)="toggleHistoryView()"
+                *ngIf="quizHistory.length > 5"
+              >
+                {{ showAllHistory ? "Thu gọn" : "Xem tất cả" }}
+              </button>
+            </div>
+
+            <div *ngIf="quizHistory.length === 0" class="text-center py-4">
+              <i class="fa fa-clipboard fa-3x text-muted"></i>
+              <p class="text-muted mt-2">Bạn chưa làm bài kiểm tra nào</p>
+              <a routerLink="/quizs" class="btn btn-primary"
+                >Làm bài kiểm tra</a
+              >
+            </div>
+
+            <div class="table-responsive" *ngIf="quizHistory.length > 0">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Tên bài kiểm tra</th>
+                    <th>Khóa học</th>
+                    <th>Điểm</th>
+                    <th>Thời gian</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="
+                      let quiz of showAllHistory
+                        ? quizHistory
+                        : quizHistory.slice(0, 5)
+                    "
+                  >
+                    <td>{{ quiz.quizName }}</td>
+                    <td>{{ quiz.courseName }}</td>
+                    <td>
+                      <span
+                        class="score-badge"
+                        [ngClass]="getScoreClass(quiz.score)"
+                      >
+                        {{ quiz.score }}/10
+                      </span>
+                    </td>
+                    <td>{{ quiz.finishedAt | date : "dd/MM/yyyy HH:mm" }}</td>
+                    <td>
+                      <button
+                        class="btn btn-sm btn-outline-info"
+                        (click)="viewQuizResult(quiz.quizId)"
+                        title="Xem kết quả"
+                      >
+                        <i class="fa fa-eye"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 <div id="snackbar">
-  If you want to change username you will have to login with new credentials
+  Nếu bạn thay đổi username, bạn sẽ phải đăng nhập lại với thông tin mới
 </div>
 <ng-template #loggedOut> Please login. </ng-template>
