@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { DeepSeekService } from './deep-seek.service';
+import { ChatAIService } from './chat-ai.service';
 
-describe('DeepSeekService', () => {
-  let service: DeepSeekService;
+describe('ChatAIService', () => {
+  let service: ChatAIService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(DeepSeekService);
+    service = TestBed.inject(ChatAIService);
   });
 
   it('should be created', () => {

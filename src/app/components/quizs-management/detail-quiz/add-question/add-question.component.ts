@@ -4,7 +4,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Question } from '../../../../model/question';
 import * as mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
-import { DeepSeekService } from '../../../../service/deepseek/deep-seek.service';
+import { ChatAIService } from '../../../../service/chat-ai/chat-ai.service';
 
 @Component({
   selector: 'app-add-question',
@@ -26,7 +26,7 @@ export class AddQuestionComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddQuestionComponent>,
-    private deepSeekService: DeepSeekService
+    private chatAIService: ChatAIService
   ) {
     this.form = this.fb.group({
       content: ['', Validators.required],
@@ -411,8 +411,8 @@ D. dap an d
     this.isProcessing = true;
 
     try {
-      // Gọi API DeepSeek để phân tích
-      const result = await this.deepSeekService.processWordFile(
+      // Gọi API ChatAI để phân tích
+      const result = await this.chatAIService.processWordFile(
         this.extractedText
       );
 
