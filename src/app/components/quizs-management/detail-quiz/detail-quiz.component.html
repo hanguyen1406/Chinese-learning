@@ -1,10 +1,7 @@
 <div style="margin-top: 55px" class="container">
   <header>
     <nav>
-      <ol
-        *ngIf="role == 'ROLE_ADMINISTRATOR'"
-        class="breadcrumb repo-breadcrumb"
-      >
+      <ol *ngIf="role == 'ROLE_ADMINISTRATOR'" class="breadcrumb repo-breadcrumb">
         <li class="breadcrumb-item">
           <a [routerLink]="['/administrator']">Quản trị ADMIN</a>
         </li>
@@ -29,44 +26,30 @@
     </div>
 
     <!-- Header cho học sinh -->
-    <div
-      style="margin-top: 60px"
-      class="row align-items-center"
-      *ngIf="role != 'ROLE_ADMINISTRATOR'"
-    >
+    <div style="margin-top: 60px" class="row align-items-center" *ngIf="role != 'ROLE_ADMINISTRATOR'">
       <div class="col-md-8">
         <h2 style="margin: 0">
           <b>Làm bài kiểm tra: {{ quiz?.name }}</b>
         </h2>
       </div>
       <div class="col-md-4 text-right d-flex">
-        <mat-card
-          color="primary"
-          class="p-2 mr-1 text-center"
-          style="
+        <mat-card color="primary" class="p-2 mr-1 text-center" style="
             font-weight: bold;
             width: 180px;
             background-color: rgb(237, 220, 188);
-          "
-        >
+          ">
           <span *ngIf="!isReviewMode">
             Thời gian còn lại: {{ displayTime }}
           </span>
           <span *ngIf="isReviewMode">Điểm {{ score }}/10</span>
         </mat-card>
-        <mat-card
-          (click)="isReviewMode ? reDoQuiz() : submitQuiz()"
-          class="p-2 mr-1 text-center"
-          style="font-weight: bold; width: 80px; background-color: limegreen; cursor: pointer;"
-        >
+        <mat-card (click)="isReviewMode ? reDoQuiz() : submitQuiz()" class="p-2 mr-1 text-center"
+          style="font-weight: bold; width: 80px; background-color: limegreen; cursor: pointer;">
           <span *ngIf="!isReviewMode"> Nộp bài </span>
           <span *ngIf="isReviewMode"> Làm lại </span>
         </mat-card>
-        <mat-card
-          (click)="exit()"
-          class="p-2 text-center"
-          style="font-weight: bold; width: 80px; background-color: orangered; cursor: pointer;"
-        >
+        <mat-card (click)="exit()" class="p-2 text-center"
+          style="font-weight: bold; width: 80px; background-color: orangered; cursor: pointer;">
           Thoát
         </mat-card>
       </div>
@@ -78,143 +61,93 @@
   <!-- Question Form -->
   <div class="col-md-9">
     <div *ngIf="questions.length > 0" class="content">
-      <form
-        [formGroup]="selectedQues"
-        (ngSubmit)="updateQuestion()"
-        *ngIf="selectedQues"
-      >
+      <form [formGroup]="selectedQues" (ngSubmit)="updateQuestion()" *ngIf="selectedQues">
         <div class="question-container">
-          <!-- Question Content -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Câu hỏi {{ currentQuestionIndex + 1 }}</mat-label>
-            <textarea
-              [readonly]="role !== 'ROLE_ADMINISTRATOR'"
-              matInput
-              formControlName="content"
-              rows="3"
-            ></textarea>
-            <mat-error>Vui lòng nhập nội dung câu hỏi</mat-error>
-          </mat-form-field>
+          <!-- Question Layout: Content (Left) - Image (Right) -->
+          <div class="d-flex align-items-center">
+            <!-- Question Content -->
+            <mat-form-field appearance="outline" class="flex-grow-1"
+              [class.mr-2]="selectedQues.get('image_url')?.value">
+              <mat-label>Câu hỏi {{ currentQuestionIndex + 1 }}</mat-label>
+              <textarea [readonly]="role !== 'ROLE_ADMINISTRATOR'" matInput formControlName="content"
+                rows="3"></textarea>
+              <mat-error>Vui lòng nhập nội dung câu hỏi</mat-error>
+            </mat-form-field>
+
+            <!-- Image Preview (Right side) -->
+            <div *ngIf="selectedQues.get('image_url')?.value" class="image-preview ml-2">
+              <img [src]="selectedQues.get('image_url')?.value" alt="Question Image"
+                style="height: 150px; width: auto; max-width: 200px; border-radius: 8px; object-fit: contain; border: 1px solid #eee;" />
+            </div>
+          </div>
 
           <!-- 4 Answers in 2x2 Grid with Radio -->
           <div class="answers-grid">
             <!-- A -->
             <div class="answer-row">
-              <mat-checkbox
-                *ngIf="isReviewMode"
-                [checked]="correctAnswer === 'a' || userAnswer === 'a'"
-                [ngClass]="{
+              <mat-checkbox *ngIf="isReviewMode" [checked]="correctAnswer === 'a' || userAnswer === 'a'" [ngClass]="{
                   correct: correctAnswer === 'a',
                   wrong: userAnswer === 'a' && correctAnswer !== 'a'
-                }"
-                disabled
-              ></mat-checkbox>
+                }" disabled></mat-checkbox>
 
-              <mat-radio-button
-                *ngIf="!isReviewMode"
-                value="a"
-                color="warn"
+              <mat-radio-button *ngIf="!isReviewMode" value="a" color="warn"
                 (change)="selectedQues.get('answer')?.setValue('a')"
-                [checked]="selectedQues.get('answer')?.value === 'a'"
-              ></mat-radio-button>
+                [checked]="selectedQues.get('answer')?.value === 'a'"></mat-radio-button>
 
               <mat-form-field appearance="outline">
                 <mat-label>Đáp án A</mat-label>
-                <input
-                  [readonly]="this.role == 'ROLE_USER'"
-                  matInput
-                  formControlName="a"
-                />
+                <input [readonly]="this.role == 'ROLE_USER'" matInput formControlName="a" />
               </mat-form-field>
             </div>
 
             <!-- B -->
             <div class="answer-row">
-              <mat-checkbox
-                *ngIf="isReviewMode"
-                [checked]="correctAnswer === 'b' || userAnswer === 'b'"
-                [ngClass]="{
+              <mat-checkbox *ngIf="isReviewMode" [checked]="correctAnswer === 'b' || userAnswer === 'b'" [ngClass]="{
                   correct: correctAnswer === 'b',
                   wrong: userAnswer === 'b' && correctAnswer !== 'b'
-                }"
-                disabled
-              ></mat-checkbox>
+                }" disabled></mat-checkbox>
 
-              <mat-radio-button
-                *ngIf="!isReviewMode"
-                value="b"
-                color="warn"
+              <mat-radio-button *ngIf="!isReviewMode" value="b" color="warn"
                 (change)="selectedQues.get('answer')?.setValue('b')"
-                [checked]="selectedQues.get('answer')?.value === 'b'"
-              ></mat-radio-button>
+                [checked]="selectedQues.get('answer')?.value === 'b'"></mat-radio-button>
 
               <mat-form-field appearance="outline">
                 <mat-label>Đáp án B</mat-label>
-                <input
-                  [readonly]="this.role == 'ROLE_USER'"
-                  matInput
-                  formControlName="b"
-                />
+                <input [readonly]="this.role == 'ROLE_USER'" matInput formControlName="b" />
               </mat-form-field>
             </div>
 
             <!-- C -->
             <div class="answer-row">
-              <mat-checkbox
-                *ngIf="isReviewMode"
-                [checked]="correctAnswer === 'c' || userAnswer === 'c'"
-                [ngClass]="{
+              <mat-checkbox *ngIf="isReviewMode" [checked]="correctAnswer === 'c' || userAnswer === 'c'" [ngClass]="{
                   correct: correctAnswer === 'c',
                   wrong: userAnswer === 'c' && correctAnswer !== 'c'
-                }"
-                disabled
-              ></mat-checkbox>
+                }" disabled></mat-checkbox>
 
-              <mat-radio-button
-                *ngIf="!isReviewMode"
-                value="c"
-                color="warn"
+              <mat-radio-button *ngIf="!isReviewMode" value="c" color="warn"
                 (change)="selectedQues.get('answer')?.setValue('c')"
-                [checked]="selectedQues.get('answer')?.value === 'c'"
-              ></mat-radio-button>
+                [checked]="selectedQues.get('answer')?.value === 'c'"></mat-radio-button>
 
               <mat-form-field appearance="outline">
                 <mat-label>Đáp án C</mat-label>
-                <input
-                  [readonly]="this.role == 'ROLE_USER'"
-                  matInput
-                  formControlName="c"
-                />
+                <input [readonly]="this.role == 'ROLE_USER'" matInput formControlName="c" />
               </mat-form-field>
             </div>
 
             <!-- D -->
             <div class="answer-row">
-              <mat-checkbox
-                *ngIf="isReviewMode"
-                [checked]="correctAnswer === 'd' || userAnswer === 'd'"
-                [ngClass]="{
+              <mat-checkbox *ngIf="isReviewMode" [checked]="correctAnswer === 'd' || userAnswer === 'd'" [ngClass]="{
                   correct: correctAnswer === 'd',
                   wrong: userAnswer === 'd' && correctAnswer !== 'd'
-                }"
-                disabled
-              ></mat-checkbox>
+                }" disabled></mat-checkbox>
 
-              <mat-radio-button
-                *ngIf="!isReviewMode"
-                value="d"
-                color="warn"
+              <mat-radio-button *ngIf="!isReviewMode" value="d" color="warn"
                 (change)="selectedQues.get('answer')?.setValue('d')"
-                [checked]="selectedQues.get('answer')?.value === 'd'"
-              ></mat-radio-button>
+                [checked]="selectedQues.get('answer')?.value === 'd'"></mat-radio-button>
 
               <mat-form-field appearance="outline">
                 <mat-label>Đáp án D</mat-label>
-                <input
-                  [readonly]="this.role == 'ROLE_USER'"
-                  matInput
-                  formControlName="d"
-                />
+                <input [readonly]="this.role == 'ROLE_USER'" matInput formControlName="d" />
               </mat-form-field>
             </div>
           </div>
@@ -222,52 +155,23 @@
           <!-- URL hình ảnh -->
           <div class="row">
             <div class="col-md-12">
-              <mat-form-field
-                *ngIf="role === 'ROLE_ADMINISTRATOR'"
-                appearance="outline"
-                class="full-width"
-              >
+              <mat-form-field *ngIf="role === 'ROLE_ADMINISTRATOR'" appearance="outline" class="full-width">
                 <mat-label>URL hình ảnh</mat-label>
-                <input
-                  matInput
-                  formControlName="image_url"
-                  placeholder="https://..."
-                />
+                <input matInput formControlName="image_url" placeholder="https://..." />
               </mat-form-field>
             </div>
           </div>
 
           <!-- Explanation -->
-          <mat-form-field
-            *ngIf="isReviewMode"
-            appearance="outline"
-            class="full-width"
-          >
+          <mat-form-field *ngIf="isReviewMode || role === 'ROLE_ADMINISTRATOR'" appearance="outline" class="full-width">
             <mat-label>Giải thích đáp án đúng</mat-label>
-            <textarea
-              matInput
-              formControlName="explanation"
-              rows="2"
-              [readonly]="isReviewMode"
-            ></textarea>
+            <textarea matInput formControlName="explanation" rows="2"
+              [readonly]="role !== 'ROLE_ADMINISTRATOR'"></textarea>
           </mat-form-field>
-
-          <!-- Image Preview -->
-          <div
-            *ngIf="selectedQues.get('image_url')?.value"
-            class="image-preview"
-          >
-            <img [src]="selectedQues.get('image_url')?.value" alt="Preview" />
-          </div>
 
           <!-- Buttons -->
           <div class="button-group" *ngIf="role == 'ROLE_ADMINISTRATOR'">
-            <button
-              mat-raised-button
-              color="primary"
-              type="submit"
-              [disabled]="!isUpdating"
-            >
+            <button mat-raised-button color="primary" type="submit" [disabled]="!isUpdating">
               <mat-icon>save</mat-icon>
               Cập nhật
             </button>
@@ -290,12 +194,8 @@
   <div class="col-md-3">
     <h3>Danh sách câu hỏi</h3>
     <div class="lesson-cards">
-      <div
-        *ngFor="let ques of questions; let i = index"
-        (click)="selectQues(ques, i)"
-        class="lesson-card"
-        [ngClass]="{ active: isQuestionSelected(ques) }"
-      >
+      <div *ngFor="let ques of questions; let i = index" (click)="selectQues(ques, i)" class="lesson-card"
+        [ngClass]="{ active: isQuestionSelected(ques) }">
         <b>Câu hỏi {{ i + 1 }}</b>
       </div>
     </div>
