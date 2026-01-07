@@ -194,3 +194,8 @@ body {
   background-color: #fddede;
 }
 
+.delete-icon {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+}

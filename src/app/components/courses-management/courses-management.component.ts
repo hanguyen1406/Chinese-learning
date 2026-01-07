@@ -10,6 +10,7 @@ import {
   NgxNotificationMsgService,
   NgxNotificationStatusMsg,
 } from 'ngx-notification-msg';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-courses-management',
@@ -23,7 +24,7 @@ export class CoursesManagementComponent implements OnInit {
     private dialog: MatDialog,
     private courseSvc: CourseService,
     private readonly ngxNotificationMsgService: NgxNotificationMsgService
-  ) {}
+  ) { }
 
   courses: any[] = [];
   role: string = '';
@@ -34,7 +35,7 @@ export class CoursesManagementComponent implements OnInit {
     this.getAllCourses();
   }
 
-  ngAfterViewInit(): void {}
+  ngAfterViewInit(): void { }
   getAllCourses() {
     this.courseSvc.getAllCourses().subscribe((courses: any) => {
       this.courses = courses;
@@ -94,6 +95,37 @@ export class CoursesManagementComponent implements OnInit {
           });
         },
       });
+    });
+  }
+
+  onDelete(course: any) {
+    if (this.role !== 'ROLE_ADMINISTRATOR') return;
+
+    Swal.fire({
+      title: 'Xác nhận xóa?',
+      text: `Bạn có chắc chắn muốn xóa khóa học "${course.name}"? Tất cả bài giảng và dữ liệu liên quan sẽ bị xóa vĩnh viễn!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Xóa ngay',
+      cancelButtonText: 'Hủy',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.courseSvc.deleteCourse(course.id).subscribe({
+          next: () => {
+            this.getAllCourses();
+            Swal.fire('Đã xóa!', 'Khóa học đã được xóa thành công.', 'success');
+          },
+          error: (err) => {
+            Swal.fire(
+              'Lỗi!',
+              err?.error?.message || 'Không thể xóa khóa học.',
+              'error'
+            );
+          },
+        });
+      }
     });
   }
 }

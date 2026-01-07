@@ -74,7 +74,7 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private ratingService: RatingService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.idCourse = this.route.snapshot.paramMap.get('idCourse')!;
@@ -522,6 +522,45 @@ export class DetailCourseComponent implements OnInit, OnDestroy {
             timerProgressBar: true,
           }),
       });
+    });
+  }
+
+  onDeleteLesson(lesson: Lesson) {
+    if (this.role !== 'ROLE_ADMINISTRATOR') return;
+
+    Swal.fire({
+      title: 'Xác nhận xóa?',
+      text: `Bạn có chắc chắn muốn xóa bài giảng "${lesson.nameLesson}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Xóa ngay',
+      cancelButtonText: 'Hủy',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.lessonService.deleteLesson(lesson.id!).subscribe({
+          next: () => {
+            Swal.fire('Đã xóa!', 'Bài giảng đã được xóa thành công.', 'success');
+
+            // Reload lessons
+            this.getLessonsOfCourse();
+
+            // If deleted lesson was selected, clear selection or select another
+            if (this.selectedLesson && this.selectedLesson.id === lesson.id) {
+              this.selectedLesson = undefined;
+              this.videoId = ''; // Stop video
+            }
+          },
+          error: (err) => {
+            Swal.fire(
+              'Lỗi!',
+              err?.error?.message || 'Không thể xóa bài giảng.',
+              'error'
+            );
+          },
+        });
+      }
     });
   }
 

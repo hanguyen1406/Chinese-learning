@@ -12,7 +12,7 @@ const API_URL = `${API_PATH}/quiz`;
   providedIn: 'root',
 })
 export class QuizService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   createQuiz(quiz: Quiz) {
     return this.http.post(API_URL, quiz);
@@ -43,6 +43,10 @@ export class QuizService {
   }
   getAllQuiz() {
     return this.http.get<Quiz[]>(API_URL);
+  }
+
+  deleteQuiz(id: number) {
+    return this.http.delete(`${API_URL}/${id}`);
   }
 
   /**

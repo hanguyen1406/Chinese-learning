@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Question } from '../../../../model/question';
 import * as mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
+import * as docx from 'docx';
 import { ChatAIService } from '../../../../service/chat-ai/chat-ai.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-question',
@@ -23,6 +25,8 @@ export class AddQuestionComponent implements OnInit {
   isProcessing = false;
   supportedFileTypes = '.docx,.doc,.xlsx,.xls';
 
+  @ViewChild('fileInput') fileInput!: ElementRef;
+
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddQuestionComponent>,
@@ -40,7 +44,33 @@ export class AddQuestionComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
+
+  // ... (previous tab 1 methods)
+
+  // ... (previous downloadTemplate methods)
+
+  // ... (previous drag and drop methods)
+
+  removeFile() {
+    this.selectedFile = null;
+    this.previewQuestions = [];
+    this.extractedText = '';
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  clearPreview() {
+    this.previewQuestions = [];
+    this.selectedFile = null;
+    this.extractedText = '';
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+
 
   // ===== TAB 1: Manual Input =====
   onCancel() {
@@ -73,38 +103,91 @@ export class AddQuestionComponent implements OnInit {
   }
 
   showTemplateOptions() {
-    const userChoice = confirm(
-      'Chọn loại file mẫu:\n\nOK - Tải mẫu Excel\nCancel - Tải mẫu Word'
-    );
-
-    if (userChoice) {
-      this.downloadExcelTemplate();
-    } else {
-      this.downloadWordTemplate();
-    }
+    Swal.fire({
+      title: 'Chọn loại file mẫu',
+      text: 'Bạn muốn tải file mẫu định dạng nào?',
+      icon: 'question',
+      showCancelButton: true,
+      showDenyButton: true,
+      confirmButtonText: 'File Excel (.xlsx)',
+      denyButtonText: 'File Word (.doc)',
+      cancelButtonText: 'Thoát',
+      confirmButtonColor: '#1d6f42', // Excel green
+      denyButtonColor: '#2b579a', // Word blue
+      didOpen: () => {
+        // Fix z-index issue ensuring alert is on top of material dialog
+        const container = document.querySelector('.swal2-container') as HTMLElement;
+        if (container) {
+          container.style.zIndex = '100000';
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.downloadExcelTemplate();
+      } else if (result.isDenied) {
+        this.downloadWordTemplate();
+      }
+    });
   }
 
   downloadWordTemplate() {
-    const templateContent = `CAU HOI TRAC NGHIEM TIENG TRUNG - MAU FILE WORD
-1. Phien am cua tu abc la gi:
-A. dap an a
-B. dap an b
-C. dap an c
-D. dap an d
-`;
+    // Generate valid .docx file using docx library
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
 
-    const blob = new Blob([templateContent], {
-      type: 'text/plain;charset=utf-8', // UTF-8 de hien thi chu Trung va Viet khong dau
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+          children: [
+            new Paragraph({
+              text: "CAU HOI TRAC NGHIEM TIENG TRUNG - MAU FILE WORD",
+              heading: HeadingLevel.HEADING_1,
+              alignment: docx.AlignmentType.CENTER,
+              spacing: { after: 200 }
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "1. Phien am cua tu abc la gi:",
+                  bold: true,
+                }),
+              ],
+              spacing: { after: 100 }
+            }),
+            new Paragraph({ text: "A. dap an a" }),
+            new Paragraph({ text: "B. dap an b" }),
+            new Paragraph({ text: "C. dap an c" }),
+            new Paragraph({ text: "D. dap an d" }),
+            new Paragraph({ text: "" }), // Empty line
+
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "2. Cau hoi thu 2:",
+                  bold: true,
+                }),
+              ],
+              spacing: { after: 100 }
+            }),
+            new Paragraph({ text: "A. A" }),
+            new Paragraph({ text: "B. B" }),
+            new Paragraph({ text: "C. C" }),
+            new Paragraph({ text: "D. D" }),
+          ],
+        },
+      ],
     });
 
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'cau_hoi_tieng_trung_mau.docx'; // hoac .docx neu khong can dinh dang Word chuan
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    Packer.toBlob(doc).then((blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'template_cau_hoi_tieng_trung.docx';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    });
   }
 
   downloadExcelTemplate() {
@@ -425,17 +508,7 @@ D. dap an d
     }
   }
 
-  removeFile() {
-    this.selectedFile = null;
-    this.previewQuestions = [];
-    this.extractedText = '';
-  }
 
-  clearPreview() {
-    this.previewQuestions = [];
-    this.selectedFile = null;
-    this.extractedText = '';
-  }
 
   removePreviewItem(index: number) {
     this.previewQuestions.splice(index, 1);

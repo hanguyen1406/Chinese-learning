@@ -2,25 +2,14 @@
   <div style="margin-top: 55px" class="container">
     <header>
       <nav>
-        <ol
-          *ngIf="role == 'ROLE_ADMINISTRATOR'"
-          class="breadcrumb repo-breadcrumb"
-        >
+        <ol *ngIf="role == 'ROLE_ADMINISTRATOR'" class="breadcrumb repo-breadcrumb">
           <li class="breadcrumb-item">
-            <a
-              href="/administrator"
-              [routerLink]="['/administrator']"
-              class="router-link-active"
-            >
+            <a href="/administrator" [routerLink]="['/administrator']" class="router-link-active">
               Quản trị ADMIN
             </a>
           </li>
           <li class="breadcrumb-item">
-            <a
-              href="/coursestable"
-              [routerLink]="['/coursestable']"
-              class="router-link-active"
-            >
+            <a href="/coursestable" [routerLink]="['/coursestable']" class="router-link-active">
               Danh sách Khóa học
             </a>
           </li>
@@ -56,16 +45,9 @@
       <div #video class="video-container" *ngIf="videoId">
         <div class="video-wrapper shadow-sm">
           <!-- Thêm id cho iframe để YouTube API có thể nhận diện -->
-          <iframe
-            #ytIframe
-            id="youtube-player"
-            width="100%"
-            height="400"
-            [src]="safeVideoUrl"
-            frameborder="0"
+          <iframe #ytIframe id="youtube-player" width="100%" height="400" [src]="safeVideoUrl" frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          >
+            allowfullscreen>
           </iframe>
         </div>
         <div class="container mb-5" *ngIf="selectedLesson">
@@ -84,41 +66,27 @@
       <h3>Nội dung Khóa học</h3>
 
       <div #lessonList class="lesson-cards shadow-sm">
-        <div
-          *ngFor="let lesson of lessons; let i = index"
-          [id]="'lesson-' + lesson.id"
-          (click)="selectLesson(lesson)"
-          class="lesson-card text-truncate"
-          [ngClass]="{ active: lesson === selectedLesson }"
-          [title]="lesson.nameLesson"
-        >
-          <div class="d-flex">
-            <mat-icon
-              *ngIf="lesson.watched"
-              style="min-width: 25px; font-size: 17px; color: #00c853"
-              >task_alt</mat-icon
-            >
-            <mat-icon
-              style="min-width: 25px; font-size: 17px; color: #939393"
-              *ngIf="!lesson.watched"
-              fontSet="material-icons-outlined"
-            >
+        <div *ngFor="let lesson of lessons; let i = index" [id]="'lesson-' + lesson.id" (click)="selectLesson(lesson)"
+          class="lesson-card text-truncate" [ngClass]="{ active: lesson === selectedLesson }"
+          [title]="lesson.nameLesson">
+          <div class="d-flex align-items-center w-100">
+            <mat-icon *ngIf="lesson.watched"
+              style="min-width: 25px; font-size: 17px; color: #00c853; margin-right: 5px;">task_alt</mat-icon>
+            <mat-icon style="min-width: 25px; font-size: 17px; color: #939393; margin-right: 5px;"
+              *ngIf="!lesson.watched" fontSet="material-icons-outlined">
               circle
             </mat-icon>
 
-            <b>{{ i + 1 }}.&nbsp; {{ lesson.nameLesson }}</b>
+            <b class="text-truncate flex-grow-1" style="min-width: 0;" [title]="lesson.nameLesson">{{ i + 1 }}.&nbsp; {{
+              lesson.nameLesson }}</b>
+            <span *ngIf="role == 'ROLE_ADMINISTRATOR'" (click)="$event.stopPropagation(); onDeleteLesson(lesson)"
+              class="delete-icon ml-2" style="cursor: pointer; flex-shrink: 0;">
+              <mat-icon style="font-size: 18px; height: 18px; width: 18px; color: red">delete</mat-icon>
+            </span>
           </div>
           <div class="d-flex">
-            <mat-icon
-              *ngIf="lesson !== selectedLesson"
-              style="font-size: 17px; color: #bb254a"
-              >access_time</mat-icon
-            >
-            <mat-icon
-              *ngIf="lesson === selectedLesson"
-              style="font-size: 20px; color: #bb254a"
-              >play_arrow</mat-icon
-            >
+            <mat-icon *ngIf="lesson !== selectedLesson" style="font-size: 17px; color: #bb254a">access_time</mat-icon>
+            <mat-icon *ngIf="lesson === selectedLesson" style="font-size: 20px; color: #bb254a">play_arrow</mat-icon>
 
             <span>{{ formatSeconds(lesson.timeLesson) }}</span>
           </div>
@@ -126,58 +94,32 @@
       </div>
 
       <!-- Nút đánh giá (chỉ hiện cho user, không hiện cho admin) -->
-      <div
-        class="rating-button-container"
-        *ngIf="role !== 'ROLE_ADMINISTRATOR'"
-      >
-        <button
-          (click)="openRatingDialog()"
-          mat-raised-button
-          class="rating-button"
-        >
+      <div class="rating-button-container" *ngIf="role !== 'ROLE_ADMINISTRATOR'">
+        <button (click)="openRatingDialog()" mat-raised-button class="rating-button">
           <mat-icon>star</mat-icon>
           {{
-            userRating
-              ? "Sửa đánh giá (" + userRating.numStar + "★)"
-              : "Đánh giá khóa học"
+          userRating
+          ? "Sửa đánh giá (" + userRating.numStar + "★)"
+          : "Đánh giá khóa học"
           }}
         </button>
       </div>
     </div>
   </div>
   <div *ngIf="hasLessons" id="cmt">
-    <button
-      (click)="openComment()"
-      mat-raised-button
-      color="primary"
-      class="pill-button"
-    >
+    <button (click)="openComment()" mat-raised-button color="primary" class="pill-button">
       <mat-icon>question_answer</mat-icon>
       Hỏi đáp
     </button>
   </div>
-  <mat-drawer
-    class="comment-drawer"
-    position="end"
-    mode="over"
-    [opened]="showComment"
-    (closedStart)="closeComment()"
-  >
+  <mat-drawer class="comment-drawer" position="end" mode="over" [opened]="showComment" (closedStart)="closeComment()">
     <div class="comment-header">
-      <button
-        style="background-color: #fff"
-        mat-icon-button
-        (click)="closeComment()"
-      >
+      <button style="background-color: #fff" mat-icon-button (click)="closeComment()">
         <mat-icon>close</mat-icon>
       </button>
     </div>
 
-    <app-comment-lesson
-      #commentSection
-      *ngIf="showComment"
-      [lessonId]="this.selectedLesson?.id"
-    >
+    <app-comment-lesson #commentSection *ngIf="showComment" [lessonId]="this.selectedLesson?.id">
     </app-comment-lesson>
   </mat-drawer>
 </mat-drawer-container>

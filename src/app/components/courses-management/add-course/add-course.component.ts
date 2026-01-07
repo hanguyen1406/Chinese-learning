@@ -19,7 +19,7 @@ export class AddCourseComponent implements OnInit {
     private dialogRef: MatDialogRef<AddCourseComponent>,
     private courseService: CourseService,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: Course | null
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -40,7 +40,12 @@ export class AddCourseComponent implements OnInit {
   loadCourses() {
     this.courseService.getAllCourses().subscribe({
       next: (data: any) => {
-        this.courses = data;
+        // Filter out current course if editing
+        if (this.data && this.data.id) {
+          this.courses = data.filter((c: any) => c.id !== this.data!.id);
+        } else {
+          this.courses = data;
+        }
 
         // Patch value SAU khi courses đã load xong
         if (this.data) {

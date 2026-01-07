@@ -14,7 +14,7 @@ const SKIP_LOADING_HEADERS = new HttpHeaders().set('X-Skip-Loading', 'true');
   providedIn: 'root',
 })
 export class LessonService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   createLesson(lesson: any) {
     return this.http.post(API_URL, lesson);
@@ -56,5 +56,9 @@ export class LessonService {
     return this.http.get<LessonProgress[]>(
       `${API_URL}/progress/course/${courseId}`
     );
+  }
+
+  deleteLesson(id: number) {
+    return this.http.delete(`${API_URL}/${id}`);
   }
 }

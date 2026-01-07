@@ -23,7 +23,7 @@ export class QuizsManagementComponent implements OnInit {
     private quizService: QuizService,
     private router: Router,
     private readonly ngxNotificationMsgService: NgxNotificationMsgService
-  ) {}
+  ) { }
 
   role: string = '';
   courses: any[] = []; // Dữ liệu đã phân loại theo Course
@@ -125,10 +125,23 @@ export class QuizsManagementComponent implements OnInit {
   }
 
   onDelete(quiz: Quiz) {
-    if (confirm(`Bạn muốn xoá bài kiểm tra "${quiz.name}" ?`)) {
-      // this.quizService.deleteQuiz(quiz.id).subscribe(() => {
-      //   this.getAllQuizs();
-      // });
+    if (quiz.id && confirm(`Bạn muốn xoá bài kiểm tra "${quiz.name}" ?`)) {
+      this.quizService.deleteQuiz(quiz.id).subscribe(() => {
+        this.getAllQuizs();
+        this.ngxNotificationMsgService.open({
+          status: NgxNotificationStatusMsg.SUCCESS,
+          header: 'Thành công',
+          messages: ['Xóa bài kiểm tra thành công!'],
+          direction: NgxNotificationDirection.BOTTOM_RIGHT,
+        });
+      }, (err) => {
+        this.ngxNotificationMsgService.open({
+          status: NgxNotificationStatusMsg.FAILURE,
+          header: 'Lỗi',
+          messages: [err?.error?.message || 'Có lỗi xảy ra khi xóa!'],
+          direction: NgxNotificationDirection.BOTTOM_RIGHT,
+        });
+      });
     }
   }
 }
